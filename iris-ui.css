@@ -1,0 +1,98 @@
+
+/* Iris Glass UI — readable on iPhone 5 320x568; legacy Safari-compatible. */
+html{background:#071321}
+body{background:radial-gradient(ellipse 120% 75% at 88% 78%,#1a355b 0%,rgba(20,39,72,.40) 45%,transparent 70%),linear-gradient(155deg,#081524 0%,#0b1a32 52%,#101a32 100%);color:#ecf6ff}
+.readability-shade{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(6,14,30,.31),rgba(6,14,30,.12) 62%,transparent 92%),linear-gradient(180deg,rgba(7,16,34,.10),transparent 43%,rgba(6,13,30,.09))}
+.app{position:relative;z-index:2;max-width:440px;margin:0 auto;padding:8px 13px 8px}
+.topbar{position:relative;height:33px;margin-bottom:3px;padding-left:7px}
+.topbar:before{content:"";position:absolute;height:15px;width:3px;left:0;top:8px;border-radius:1px;background:#52e9f1;box-shadow:0 0 9px rgba(80,232,250,.56)}
+.topbar:after{content:"";position:absolute;left:136px;right:47px;top:16px;height:1px;background:linear-gradient(90deg,rgba(116,188,236,.3),rgba(112,224,252,.55) 70%,transparent)}
+.brand{font-size:10px;letter-spacing:2.2px;color:#aec8e5;line-height:32px;font-weight:700;text-shadow:0 0 8px rgba(83,160,232,.15)}
+.brand strong{color:#66edeb;letter-spacing:2.7px}
+.settings-button{width:34px;height:32px;line-height:30px;background:rgba(26,51,80,.75);border:1px solid rgba(148,204,245,.47);border-radius:11px;color:#eaf8ff;font-size:19px;text-shadow:0 0 7px rgba(180,233,255,.4);box-shadow:inset 0 0 10px rgba(131,192,242,.08)}
+.card{border:1px solid rgba(138,201,247,.46);border-radius:19px;background:rgba(13,31,57,.73);box-shadow:0 2px 19px rgba(4,13,34,.18),inset 0 1px 0 rgba(204,234,255,.11)}
+.clock-card,html.photo-active .clock-card{position:relative;padding:5px 3px 12px;min-height:112px;margin-bottom:6px;text-align:left;background:transparent;border:0;border-radius:0;overflow:visible;box-shadow:none}
+.clock-card:before{content:"";position:absolute;top:-6px;left:130px;width:123px;height:123px;border-radius:50%;border:1px solid rgba(116,200,243,.31);border-right-color:transparent;border-bottom-color:transparent;-webkit-transform:rotate(24deg);transform:rotate(24deg);pointer-events:none}
+.clock-card:after{content:"";position:absolute;left:3px;bottom:1px;width:82%;height:1px;background:linear-gradient(90deg,#64d8ef,rgba(82,182,239,.35) 22%,transparent);box-shadow:-1px 0 5px rgba(66,221,241,.29);pointer-events:none}
+.clock{position:relative;z-index:1;font-size:68px;line-height:1.09;letter-spacing:-2.8px;font-weight:300;text-align:left;color:#f1faff;text-shadow:0 1px 14px rgba(177,211,255,.22)}
+.clock.smaller{font-size:58px}.clock.larger{font-size:75px}
+.date-line{position:relative;z-index:1;margin-top:6px;text-align:left;font-size:13px;letter-spacing:0;font-weight:500;white-space:nowrap;color:#e5effb}
+.date-line:before{content:"▦";display:inline-block;padding-right:4px;color:#8cd9f4;font-size:15px}
+.date-part{display:inline-block;margin:0 2px}.date-part:first-child{color:#68f3ee}
+.weather-card{padding:10px 12px 8px;margin-bottom:9px;min-height:73px;border-radius:20px;background:rgba(31,58,96,.68)}
+.weather-row{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-webkit-flex-direction:row-reverse;flex-direction:row-reverse;min-height:38px}
+.weather-row>div:first-child{text-align:right;white-space:nowrap}.weather-label{display:none}
+.temperature{font-size:32px;line-height:1;font-weight:300;color:#f2fbff;letter-spacing:-1px}
+.degree{font-size:15px;color:#c7eaf7;vertical-align:baseline;letter-spacing:-1px}
+.weather-right{text-align:left;position:relative;padding-left:36px;min-width:95px}
+.weather-icon{position:absolute;left:0;top:2px;font-size:27px;height:29px;line-height:29px;color:#c3f6ff;text-shadow:0 0 13px rgba(116,206,242,.35)}
+.weather-city{font-size:14px;line-height:1.4;font-weight:650;color:#ecf8ff}
+.weather-description{font-size:11px;margin-top:0;line-height:1.25;color:#b5d0e4}
+.weather-foot{margin-top:6px;padding-top:5px;border-top:1px solid rgba(154,200,234,.18);color:#abc8db;font-size:10px;line-height:13px}
+.refresh{font-size:10px;color:#bde7f3}
+.calendar-card{width:276px;max-width:100%;padding:10px 10px 8px;margin-bottom:8px;border-radius:19px;background:rgba(11,28,53,.76);overflow:visible}
+.calendar-head{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;justify-content:space-between;-webkit-box-align:center;-webkit-align-items:center;align-items:center;margin-bottom:4px;min-height:27px}
+.calendar-title{text-align:left;font-size:16px;font-weight:700;line-height:28px;margin:0;white-space:nowrap;color:#f5fbff}
+.calendar-title:before{content:"▦";display:inline-block;font-size:16px;color:#b0e5f1;margin-right:6px;font-weight:400}
+.calendar-title .month{color:#60ecf0}
+.calendar-nav{display:-webkit-box;display:-webkit-flex;display:flex;border:1px solid rgba(159,211,244,.35);background:rgba(60,96,134,.25);border-radius:17px;overflow:hidden}
+.calendar-nav button{color:#e4f5ff;background:transparent;border:0;width:28px;height:28px;line-height:28px;padding:0;font-size:19px}
+.calendar-nav button:first-child{border-right:1px solid rgba(158,208,236,.23)}
+.calendar-nav button:active{background:rgba(100,207,237,.29)}
+.calendar{border-collapse:collapse;table-layout:fixed;width:100%}
+.calendar th{height:23px;font-size:12px;color:#c9d6e6;font-weight:500}
+.calendar td{height:30px;font-size:14px;color:#f1f7ff;font-weight:500;line-height:28px}
+.calendar td span{width:27px;line-height:27px}
+.calendar th:first-child,.calendar td.sunday{color:#ff9ea8}
+.calendar th:last-child,.calendar td.saturday{color:#89bdff}
+.calendar td.muted{color:#7990a9;opacity:.62}
+.calendar td.today span{width:27px;height:27px;line-height:27px;border-radius:50%;background:#5ee9f4;color:#0a2132;box-shadow:0 0 0 2px rgba(113,225,244,.29),0 0 11px rgba(91,236,249,.35)}
+.calendar-card.six-weeks .calendar td{height:27px;font-size:13px}
+.iris-signature{display:inline-block;margin:3px 0 4px 3px;padding:5px 13px 6px;border-radius:18px;border:1px solid rgba(146,218,251,.44);background:rgba(28,56,88,.62);color:#dbeeff;font-size:12px;line-height:17px;box-shadow:0 1px 11px rgba(15,46,79,.24)}
+.iris-signature .iris-mark{font-size:15px;margin-right:8px;color:#6ceff0}
+.iris-signature .iris-minor{color:#a7c3dc;font-size:10px;margin-left:8px}
+.foot{text-align:left;margin:1px 0 2px 7px;font-size:10px;color:#9bbbd0}
+.foot:before{content:"╱";margin-right:6px;color:#6bddf4}
+.foot a{color:#8deafa;text-underline-offset:2px}
+.settings-panel{background:#0a192a}
+html.photo-active .calendar-card{background:rgba(11,28,53,.76)}
+html.photo-active .weather-card{background:rgba(31,58,96,.68)}
+html.photo-active .clock-card{background:transparent}
+body.light{color:#172d42;background:linear-gradient(150deg,#dae6f0,#e4eefa)}
+body.light .clock{color:#17354e;text-shadow:none}
+body.light .date-line{color:#22435c}
+body.light .weather-card,html.photo-active body.light .weather-card{background:rgba(247,253,255,.89);border-color:rgba(150,194,220,.7)}
+body.light .calendar-card,html.photo-active body.light .calendar-card{background:rgba(246,251,255,.90);border-color:rgba(150,194,220,.7)}
+body.light .calendar-title{color:#19384c}
+body.light .calendar th,body.light .calendar td{color:#29465e}
+body.light .calendar td.muted{color:#819aaf}
+body.light .calendar td.sunday{color:#b14762}
+body.light .calendar td.saturday{color:#3671a5}
+body.light .weather-city,body.light .temperature{color:#19394e}
+body.light .weather-description,body.light .weather-foot{color:#557c90}
+body.light .iris-signature{background:rgba(241,249,255,.9);color:#254559}
+body.light .iris-signature .iris-minor{color:#567a93}
+body.light .topbar:after{background:linear-gradient(90deg,rgba(36,130,160,.35),transparent)}
+@media (max-width:359px){
+.app{padding:7px 12px 6px}.topbar{height:31px;margin-bottom:2px}
+.clock-card{min-height:105px;padding-top:4px;padding-bottom:10px;margin-bottom:5px}
+.clock{font-size:66px}.clock.smaller{font-size:58px}.clock.larger{font-size:73px}
+.date-line{font-size:12.8px}
+.weather-card{padding:9px 12px 7px;margin-bottom:8px}
+.calendar-card{width:232px;padding:9px 7px 8px}
+.calendar td{height:30px;font-size:14px}
+.iris-signature{margin-top:2px}
+}
+@media (max-height:550px){
+.app{padding-top:5px}.topbar{height:30px}
+.clock-card{min-height:100px;padding-bottom:8px}
+.weather-card{margin-bottom:6px}.calendar-card{margin-bottom:4px}
+.iris-signature{margin-top:0;padding-top:3px;padding-bottom:3px}
+}
+@media (min-width:400px) and (min-height:650px){
+.app{padding-top:14px;padding-left:18px;padding-right:18px}
+.clock{font-size:78px}.clock.smaller{font-size:66px}.clock.larger{font-size:88px}
+.calendar-card{width:325px}.calendar td{height:34px;font-size:14px}
+.calendar td span{width:30px;line-height:30px}
+.calendar td.today span{width:30px;height:30px;line-height:30px}
+}
