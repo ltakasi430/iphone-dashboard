@@ -112,10 +112,12 @@
     }
   </style>
   <link rel="stylesheet" href="background.css">
+  <link rel="stylesheet" href="iris-ui.css?v=2">
 </head>
 <body>
   <div id="backgroundArt" class="background-art" aria-hidden="true"></div>
   <div id="backgroundVeil" class="background-veil" aria-hidden="true"></div>
+  <div class="readability-shade" aria-hidden="true"></div>
   <div class="app">
     <header class="topbar">
       <div class="brand">POCKET <strong>DESK</strong></div>
@@ -143,13 +145,17 @@
         <div class="weather-foot"><span id="weatherUpdated">気温は約15分ごとに更新</span><button id="refreshWeather" class="refresh" type="button">&#8635; 更新</button></div>
       </section>
       <section id="calendarCard" class="card calendar-card" aria-label="月間カレンダー">
-        <div id="calendarTitle" class="calendar-title">----年 --月</div>
+        <div class="calendar-head">
+          <div id="calendarTitle" class="calendar-title" role="button" tabindex="0" title="今月に戻る">----年 --月</div>
+          <div class="calendar-nav"><button id="calendarPrev" type="button" aria-label="前の月">&#8249;</button><button id="calendarNext" type="button" aria-label="次の月">&#8250;</button></div>
+        </div>
         <table class="calendar" aria-label="今月のカレンダー">
           <thead><tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr></thead>
           <tbody id="calendarBody"></tbody>
         </table>
       </section>
     </main>
+    <div id="irisSignature" class="iris-signature"><span class="iris-mark" aria-hidden="true">&#9651;</span>Iris <span class="iris-minor">│ Coneco Navigator</span></div>
     <div id="weatherAttribution" class="foot">天気データ: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a></div>
   </div>
   <div id="settingsPanel" class="settings-panel" role="dialog" aria-label="表示設定">
@@ -162,6 +168,7 @@
       <label class="setting-row">曜日 <input id="settingWeekday" type="checkbox" checked></label>
       <label class="setting-row">気温・天気 <input id="settingWeather" type="checkbox" checked></label>
       <label class="setting-row">月間カレンダー <input id="settingCalendar" type="checkbox" checked></label>
+      <label class="setting-row">Irisラベル <input id="settingIris" type="checkbox" checked></label>
       <div class="setting-heading">デザイン</div>
       <label class="setting-row">時計の大きさ
         <select id="settingClockSize" class="setting-select"><option value="standard">標準</option><option value="small">小さめ</option><option value="large">大きめ</option></select>
@@ -176,6 +183,9 @@
       <div id="backgroundStatus" class="background-status" role="status" aria-live="polite"></div>
       <label class="setting-row background-option">画像の明るさ <span><input id="backgroundBrightness" class="background-range" type="range" min="10" max="100" step="5"><span id="backgroundBrightnessValue" class="background-range-value"></span></span></label>
       <label class="setting-row background-option">ぼかし <span><input id="backgroundBlur" class="background-range" type="range" min="0" max="16" step="2"><span id="backgroundBlurValue" class="background-range-value"></span></span></label>
+      <label class="setting-row">壁紙の構図
+        <select id="backgroundFraming" class="setting-select"><option value="iris">Iris向け（顔を右下に）</option><option value="normal">写真全体を表示</option></select>
+      </label>
       <label class="setting-row">画像の位置
         <select id="backgroundPosition" class="setting-select"><option value="top">上寄せ</option><option value="center">中央</option><option value="bottom">下寄せ</option></select>
       </label>
@@ -215,8 +225,9 @@
       77: ["雪", "❄"], 80: ["にわか雨", "☂"], 81: ["にわか雨", "☂"], 82: ["強いにわか雨", "☂"],
       85: ["にわか雪", "❄"], 86: ["にわか雪", "❄"], 95: ["雷雨", "⚡"], 96: ["雷雨", "⚡"], 99: ["雷雨", "⚡"]
     };
-    var defaults = { time: true, year: true, date: true, weekday: true, weather: true, calendar: true, clockSize: "standard", theme: "dark", city: "kyoto" };
+    var defaults = { time: true, year: true, date: true, weekday: true, weather: true, calendar: true, iris: true, clockSize: "standard", theme: "dark", city: "kyoto" };
     var s = {};
+    var calendarMonthOffset = 0;
     var lastDayKey = "";
     var lastMinuteKey = "";
     var loadingWeather = false;
@@ -248,6 +259,7 @@
       el("settingWeekday").checked = s.weekday;
       el("settingWeather").checked = s.weather;
       el("settingCalendar").checked = s.calendar;
+      el("settingIris").checked = s.iris;
       el("settingClockSize").value = s.clockSize;
       el("settingTheme").value = s.theme;
       el("settingCity").value = s.city;
@@ -261,6 +273,7 @@
       visible("clockCard", s.time || s.year || s.date || s.weekday);
       visible("weatherCard", s.weather);
       visible("calendarCard", s.calendar);
+      visible("irisSignature", s.iris);
       visible("weatherAttribution", s.weather);
       el("time").className = "clock" + (s.clockSize === "small" ? " smaller" : (s.clockSize === "large" ? " larger" : "")) + (s.time ? "" : " hidden");
       document.body.className = s.theme === "light" ? "light" : "";
@@ -283,14 +296,21 @@
       }
     }
     function renderCalendar(year, month, day) {
+      var displayed = new Date(year, month + calendarMonthOffset, 1);
+      year = displayed.getFullYear();
+      month = displayed.getMonth();
+      if (calendarMonthOffset !== 0) { day = -1; }
       el("calendarTitle").innerHTML = year + "年 <span class=\"month\">" + (month + 1) + "月</span>";
       var firstDay = new Date(year, month, 1).getDay();
       var daysThisMonth = new Date(year, month + 1, 0).getDate();
       var daysLastMonth = new Date(year, month, 0).getDate();
       var body = el("calendarBody");
       while (body.firstChild) { body.removeChild(body.firstChild); }
-      /* Always six rows, so the dashboard does not jump between months. */
-      for (var row = 0; row < 6; row++) {
+      /* At least five rows, six only when required. Keep dates legible on iPhone 5. */
+      var rowsNeeded = Math.max(5, Math.ceil((firstDay + daysThisMonth) / 7));
+      var card = el("calendarCard");
+      card.className = card.className.replace(/\s+six-weeks/g, "") + (rowsNeeded === 6 ? " six-weeks" : "");
+      for (var row = 0; row < rowsNeeded; row++) {
         var tr = document.createElement("tr");
         for (var col = 0; col < 7; col++) {
           var index = row * 7 + col;
@@ -309,6 +329,10 @@
         }
         body.appendChild(tr);
       }
+    }
+    function redrawViewedMonth() {
+      var now = new Date();
+      renderCalendar(now.getFullYear(), now.getMonth(), now.getDate());
     }
     function displayWeather(temperature, code, fetchedAt, cached) {
       if (typeof temperature !== "number" || !isFinite(temperature)) { return; }
@@ -389,6 +413,18 @@
       fetchWeather(true);
       setInterval(updateClock, 1000);
       setInterval(function () { fetchWeather(false); }, 15 * 60 * 1000);
+      el("calendarPrev").addEventListener("click", function () {
+        if (calendarMonthOffset > -24) { calendarMonthOffset--; redrawViewedMonth(); }
+      }, false);
+      el("calendarNext").addEventListener("click", function () {
+        if (calendarMonthOffset < 24) { calendarMonthOffset++; redrawViewedMonth(); }
+      }, false);
+      el("calendarTitle").addEventListener("click", function () {
+        calendarMonthOffset = 0; redrawViewedMonth();
+      }, false);
+      el("calendarTitle").addEventListener("keydown", function (ev) {
+        if (ev.keyCode === 13 || ev.keyCode === 32) { ev.preventDefault(); calendarMonthOffset = 0; redrawViewedMonth(); }
+      }, false);
       el("openSettings").addEventListener("click", openSettings, false);
       el("closeSettings").addEventListener("click", closeSettings, false);
       el("refreshWeather").addEventListener("click", function () { fetchWeather(true); }, false);
@@ -398,6 +434,7 @@
       bindCheckbox("settingWeekday", "weekday");
       bindCheckbox("settingWeather", "weather");
       bindCheckbox("settingCalendar", "calendar");
+      bindCheckbox("settingIris", "iris");
       el("settingClockSize").addEventListener("change", function () { s.clockSize = this.value; saveAndApply(); }, false);
       el("settingTheme").addEventListener("change", function () { s.theme = this.value; saveAndApply(); }, false);
       el("settingCity").addEventListener("change", function () {
