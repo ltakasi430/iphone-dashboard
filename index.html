@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Pocket Desk">
+  <meta name="theme-color" content="#091420">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <title>Pocket Desk | iPhone 5 ダッシュボード</title>
+  <style>
+    /* CSS and JavaScript intentionally target iOS 10 Safari (ES5, no dependencies). */
+    * { -webkit-box-sizing: border-box; box-sizing: border-box; }
+    html { height: 100%; background: #091420; }
+    body {
+      margin: 0; min-height: 100%; background: #091420;
+      color: #f0f6ff; font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased;
+    }
+    button, select { font-family: inherit; }
+    button { -webkit-appearance: none; appearance: none; cursor: pointer; }
+    .app { max-width: 440px; margin: 0 auto; padding: 10px 12px 8px; }
+    .topbar { height: 32px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; -webkit-box-pack: justify; -webkit-justify-content: space-between; justify-content: space-between; margin-bottom: 7px; }
+    .brand { font-size: 11px; letter-spacing: 2.2px; color: #84a6bd; font-weight: 700; }
+    .brand strong { color: #75e2c5; }
+    .settings-button { border: 1px solid #284357; background: #142838; color: #dce9ef; font-size: 18px; width: 32px; height: 32px; line-height: 28px; border-radius: 10px; text-align: center; padding: 0; }
+    .card { background: #102334; border: 1px solid #1e4054; border-radius: 16px; margin-bottom: 9px; overflow: hidden; }
+    .clock-card { text-align: center; padding: 12px 8px 10px; background: -webkit-linear-gradient(top, #122c3d 0%, #102334 100%); background: linear-gradient(180deg, #122c3d 0%, #102334 100%); }
+    .clock { font-size: 73px; letter-spacing: -3px; font-weight: 300; font-variant-numeric: tabular-nums; line-height: 1.03; }
+    .clock.smaller { font-size: 56px; }
+    .clock.larger { font-size: 84px; }
+    .date-line { font-size: 15px; letter-spacing: .2px; margin-top: 8px; font-weight: 500; color: #c6d5df; }
+    .date-part { display: inline-block; margin: 0 3px; }
+    .date-part:first-child { color: #78e7c6; }
+    .weather-card { padding: 12px 14px; }
+    .weather-row { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; -webkit-box-pack: justify; -webkit-justify-content: space-between; justify-content: space-between; }
+    .weather-label { color: #9cb8c9; font-size: 12px; margin-bottom: 2px; }
+    .temperature { font-size: 40px; line-height: 1.1; font-weight: 300; color: #effbff; }
+    .degree { font-size: 23px; color: #86aebf; }
+    .weather-right { text-align: right; }
+    .weather-icon { font-size: 27px; height: 34px; }
+    .weather-city { font-size: 13px; font-weight: 650; }
+    .weather-description { font-size: 11px; color: #90adbf; margin-top: 3px; }
+    .weather-foot { border-top: 1px solid #234054; margin-top: 8px; padding-top: 7px; color: #7897aa; font-size: 10px; overflow: hidden; }
+    .refresh { float: right; background: transparent; border: 0; color: #a6c6db; font-size: 11px; padding: 0; }
+    .calendar-card { padding: 12px 11px 11px; }
+    .calendar-title { font-size: 16px; letter-spacing: .2px; font-weight: 650; text-align: center; margin-bottom: 9px; }
+    .calendar-title .month { color: #78e7c6; }
+    .calendar { border-collapse: collapse; table-layout: fixed; width: 100%; }
+    .calendar th { height: 23px; text-align: center; color: #9aafc0; font-size: 11px; font-weight: 600; }
+    .calendar td { height: 29px; text-align: center; padding: 0; font-size: 12px; font-weight: 500; }
+    .calendar th:first-child, .calendar td.sunday { color: #f19a9e; }
+    .calendar th:last-child, .calendar td.saturday { color: #8fbefa; }
+    .calendar td.muted { color: #536a79; }
+    .calendar td.today span { background: #71d9bd; color: #0a2433; font-weight: 800; display: inline-block; width: 27px; height: 27px; line-height: 27px; border-radius: 50%; }
+    .calendar td span { display: inline-block; width: 27px; line-height: 27px; }
+    .foot { text-align: center; font-size: 10px; color: #7493a3; margin: 1px 0 3px; }
+    .foot a { color: inherit; }
+    .hidden { display: none !important; }
+    /* Settings use a simple full-screen panel: reliable on old Mobile Safari. */
+    .settings-panel { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: #091420; z-index: 20; overflow-y: auto; -webkit-overflow-scrolling: touch; display: none; }
+    .settings-panel.open { display: block; }
+    .settings-content { max-width: 440px; margin: 0 auto; padding: 18px 16px 35px; }
+    .settings-top { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-pack: justify; -webkit-justify-content: space-between; justify-content: space-between; -webkit-box-align: center; -webkit-align-items: center; align-items: center; margin-bottom: 14px; }
+    .settings-top h1 { margin: 0; font-size: 21px; }
+    .done { background: #72d8bb; color: #092335; border: 0; border-radius: 10px; font-size: 14px; font-weight: 700; padding: 10px 14px; }
+    .setting-heading { color: #9eb8c8; font-size: 12px; margin: 20px 0 8px; }
+    .setting-row { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-pack: justify; -webkit-justify-content: space-between; justify-content: space-between; -webkit-box-align: center; -webkit-align-items: center; align-items: center; border-bottom: 1px solid #244154; padding: 12px 6px; font-size: 15px; }
+    .setting-row input[type=checkbox] { width: 21px; height: 21px; accent-color: #69d6b6; }
+    .setting-select { width: 154px; font-size: 14px; color: #f0f6ff; background: #18364a; border: 1px solid #32556a; border-radius: 8px; padding: 8px 4px; }
+    .setting-note { color: #8ba9ba; font-size: 12px; line-height: 1.65; padding: 10px 4px; }
+    .reset-button { display: block; margin-top: 20px; background: transparent; border: 1px solid #496276; color: #c6d9e5; border-radius: 9px; padding: 10px 13px; }
+    /* Night-friendly light mode is optional, and deliberately keeps high contrast. */
+    body.light, body.light .settings-panel { background: #ebf2f4; color: #162c3a; }
+    body.light .brand { color: #426075; }
+    body.light .brand strong { color: #147d65; }
+    body.light .card { background: #fff; border-color: #d6e3e9; }
+    body.light .clock-card { background: -webkit-linear-gradient(top, #f8ffff, #ffffff); background: linear-gradient(180deg, #f8ffff, #ffffff); }
+    body.light .date-line { color: #3c5260; }
+    body.light .date-part:first-child { color: #118565; }
+    body.light .weather-label, body.light .weather-description, body.light .weather-foot { color: #607f90; }
+    body.light .temperature { color: #17334a; }
+    body.light .degree { color: #607f90; }
+    body.light .calendar-title .month { color: #108466; }
+    body.light .calendar th { color: #64798c; }
+    body.light .calendar td.sunday { color: #ca5c66; }
+    body.light .calendar td.saturday { color: #4b83bc; }
+    body.light .calendar td.muted { color: #bac9d1; }
+    body.light .calendar td.today span { background: #1b9a78; color: #fff; }
+    body.light .settings-button { background: #ffffff; color: #17334a; border-color: #cddce5; }
+    body.light .setting-row { border-bottom-color: #cad9e1; }
+    body.light .setting-heading, body.light .setting-note { color: #526d7e; }
+    body.light .setting-select { background: #fff; color: #17334a; }
+    body.light .foot { color: #64798c; }
+    @media (max-height: 620px) {
+      .app { padding-top: 6px; padding-bottom: 4px; }
+      .topbar { margin-bottom: 4px; }
+      .card { margin-bottom: 6px; }
+      .clock-card { padding-top: 7px; padding-bottom: 6px; }
+      .clock { font-size: 66px; }
+      .clock.smaller { font-size: 53px; }
+      .clock.larger { font-size: 76px; }
+      .date-line { margin-top: 5px; }
+      .weather-card { padding-top: 8px; padding-bottom: 8px; }
+      .temperature { font-size: 36px; }
+      .weather-foot { margin-top: 5px; padding-top: 5px; }
+      .calendar-card { padding-top: 8px; padding-bottom: 6px; }
+      .calendar td { height: 25px; }
+      .calendar th { height: 21px; }
+      .calendar-title { margin-bottom: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">POCKET <strong>DESK</strong></div>
+      <button id="openSettings" class="settings-button" type="button" aria-label="表示設定を開く">&#9881;</button>
+    </header>
+    <main>
+      <section id="clockCard" class="card clock-card" aria-label="現在日時">
+        <div id="time" class="clock">--:--</div>
+        <div id="dateLine" class="date-line">
+          <span id="year" class="date-part">2026年</span><span id="date" class="date-part">11月3日</span><span id="weekday" class="date-part">火曜日</span>
+        </div>
+      </section>
+      <section id="weatherCard" class="card weather-card" aria-label="現在の気温">
+        <div class="weather-row">
+          <div>
+            <div class="weather-label">現在の気温</div>
+            <div class="temperature"><span id="temperature">--</span><span class="degree">°C</span></div>
+          </div>
+          <div class="weather-right">
+            <div id="weatherIcon" class="weather-icon" aria-hidden="true">☀</div>
+            <div id="weatherCity" class="weather-city">京都</div>
+            <div id="weatherDescription" class="weather-description">取得しています…</div>
+          </div>
+        </div>
+        <div class="weather-foot"><span id="weatherUpdated">気温は約15分ごとに更新</span><button id="refreshWeather" class="refresh" type="button">&#8635; 更新</button></div>
+      </section>
+      <section id="calendarCard" class="card calendar-card" aria-label="月間カレンダー">
+        <div id="calendarTitle" class="calendar-title">----年 --月</div>
+        <table class="calendar" aria-label="今月のカレンダー">
+          <thead><tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr></thead>
+          <tbody id="calendarBody"></tbody>
+        </table>
+      </section>
+    </main>
+    <div id="weatherAttribution" class="foot">天気データ: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a></div>
+  </div>
+  <div id="settingsPanel" class="settings-panel" role="dialog" aria-label="表示設定">
+    <div class="settings-content">
+      <div class="settings-top"><h1>表示設定</h1><button id="closeSettings" class="done" type="button">完了</button></div>
+      <div class="setting-heading">表示する項目（個別にオン・オフできます）</div>
+      <label class="setting-row">時計 <input id="settingTime" type="checkbox" checked></label>
+      <label class="setting-row">西暦 <input id="settingYear" type="checkbox" checked></label>
+      <label class="setting-row">年月日 <input id="settingDate" type="checkbox" checked></label>
+      <label class="setting-row">曜日 <input id="settingWeekday" type="checkbox" checked></label>
+      <label class="setting-row">気温・天気 <input id="settingWeather" type="checkbox" checked></label>
+      <label class="setting-row">月間カレンダー <input id="settingCalendar" type="checkbox" checked></label>
+      <div class="setting-heading">デザイン</div>
+      <label class="setting-row">時計の大きさ
+        <select id="settingClockSize" class="setting-select"><option value="standard">標準</option><option value="small">小さめ</option><option value="large">大きめ</option></select>
+      </label>
+      <label class="setting-row">テーマ
+        <select id="settingTheme" class="setting-select"><option value="dark">ダーク</option><option value="light">ライト</option></select>
+      </label>
+      <div class="setting-heading">気温を表示する地域</div>
+      <label class="setting-row">地域
+        <select id="settingCity" class="setting-select">
+          <option value="kyoto">京都</option><option value="osaka">大阪</option><option value="kobe">神戸</option>
+          <option value="tokyo">東京</option><option value="nagoya">名古屋</option><option value="fukuoka">福岡</option><option value="sapporo">札幌</option>
+        </select>
+      </label>
+      <div class="setting-note">設定はこの端末のブラウザに保存します。気温はOpen-Meteoの予測データです。通信できない場合、直近の情報を参考として表示することがあります。</div>
+      <button id="resetSettings" class="reset-button" type="button">初期設定に戻す</button>
+    </div>
+  </div>
+  <script>
+  (function () {
+    "use strict";
+    /* Avoid newer JS syntax/APIs so the page also runs on iOS 10 Safari. */
+    var STORAGE_KEY = "pocket-desk-settings-v1";
+    var WEATHER_KEY = "pocket-desk-weather-v1";
+    var cityList = {
+      kyoto: { name: "京都", lat: 35.0116, lon: 135.7681 },
+      osaka: { name: "大阪", lat: 34.6937, lon: 135.5023 },
+      kobe: { name: "神戸", lat: 34.6901, lon: 135.1955 },
+      tokyo: { name: "東京", lat: 35.6762, lon: 139.6503 },
+      nagoya: { name: "名古屋", lat: 35.1815, lon: 136.9066 },
+      fukuoka: { name: "福岡", lat: 33.5902, lon: 130.4017 },
+      sapporo: { name: "札幌", lat: 43.0618, lon: 141.3545 }
+    };
+    var weekdays = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
+    var weatherDescriptions = {
+      0: ["晴れ", "☀"], 1: ["おおむね晴れ", "☀"], 2: ["晴れ時々くもり", "⛅"], 3: ["くもり", "☁"],
+      45: ["霧", "☁"], 48: ["霧", "☁"], 51: ["霧雨", "☂"], 53: ["霧雨", "☂"], 55: ["強い霧雨", "☂"],
+      56: ["霧雨", "☂"], 57: ["霧雨", "☂"], 61: ["弱い雨", "☂"], 63: ["雨", "☂"], 65: ["強い雨", "☂"],
+      66: ["雨", "☂"], 67: ["雨", "☂"], 71: ["小雪", "❄"], 73: ["雪", "❄"], 75: ["大雪", "❄"],
+      77: ["雪", "❄"], 80: ["にわか雨", "☂"], 81: ["にわか雨", "☂"], 82: ["強いにわか雨", "☂"],
+      85: ["にわか雪", "❄"], 86: ["にわか雪", "❄"], 95: ["雷雨", "⚡"], 96: ["雷雨", "⚡"], 99: ["雷雨", "⚡"]
+    };
+    var defaults = { time: true, year: true, date: true, weekday: true, weather: true, calendar: true, clockSize: "standard", theme: "dark", city: "kyoto" };
+    var s = {};
+    var lastDayKey = "";
+    var lastMinuteKey = "";
+    var loadingWeather = false;
+    var lastWeatherRequest = 0;
+
+    function el(id) { return document.getElementById(id); }
+    function two(n) { return n < 10 ? "0" + n : "" + n; }
+    function setText(id, value) { el(id).textContent = value; }
+    function visible(id, show) { el(id).className = el(id).className.replace(/\s*hidden/g, "") + (show ? "" : " hidden"); }
+    function safeRead(key) { try { return JSON.parse(window.localStorage.getItem(key)); } catch (e) { return null; } }
+    function safeWrite(key, value) { try { window.localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
+    function copyDefaults() { var out = {}; for (var k in defaults) { if (defaults.hasOwnProperty(k)) { out[k] = defaults[k]; } } return out; }
+    function readSettings() {
+      s = copyDefaults();
+      var saved = safeRead(STORAGE_KEY);
+      if (saved && typeof saved === "object") {
+        for (var k in defaults) {
+          if (defaults.hasOwnProperty(k) && typeof saved[k] === typeof defaults[k]) { s[k] = saved[k]; }
+        }
+      }
+      if (!cityList[s.city]) { s.city = "kyoto"; }
+      if (s.clockSize !== "standard" && s.clockSize !== "small" && s.clockSize !== "large") { s.clockSize = "standard"; }
+      if (s.theme !== "dark" && s.theme !== "light") { s.theme = "dark"; }
+    }
+    function syncInputs() {
+      el("settingTime").checked = s.time;
+      el("settingYear").checked = s.year;
+      el("settingDate").checked = s.date;
+      el("settingWeekday").checked = s.weekday;
+      el("settingWeather").checked = s.weather;
+      el("settingCalendar").checked = s.calendar;
+      el("settingClockSize").value = s.clockSize;
+      el("settingTheme").value = s.theme;
+      el("settingCity").value = s.city;
+    }
+    function applySettings() {
+      visible("time", s.time);
+      visible("year", s.year);
+      visible("date", s.date);
+      visible("weekday", s.weekday);
+      visible("dateLine", s.year || s.date || s.weekday);
+      visible("clockCard", s.time || s.year || s.date || s.weekday);
+      visible("weatherCard", s.weather);
+      visible("calendarCard", s.calendar);
+      visible("weatherAttribution", s.weather);
+      el("time").className = "clock" + (s.clockSize === "small" ? " smaller" : (s.clockSize === "large" ? " larger" : "")) + (s.time ? "" : " hidden");
+      document.body.className = s.theme === "light" ? "light" : "";
+      setText("weatherCity", cityList[s.city].name);
+    }
+    function updateClock() {
+      var now = new Date();
+      var minuteKey = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate() + "-" + now.getHours() + "-" + now.getMinutes();
+      var dayKey = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate();
+      if (minuteKey !== lastMinuteKey) {
+        setText("time", two(now.getHours()) + ":" + two(now.getMinutes()));
+        lastMinuteKey = minuteKey;
+      }
+      if (dayKey !== lastDayKey) {
+        setText("year", now.getFullYear() + "年");
+        setText("date", (now.getMonth() + 1) + "月" + now.getDate() + "日");
+        setText("weekday", weekdays[now.getDay()]);
+        renderCalendar(now.getFullYear(), now.getMonth(), now.getDate());
+        lastDayKey = dayKey;
+      }
+    }
+    function renderCalendar(year, month, day) {
+      el("calendarTitle").innerHTML = year + "年 <span class=\"month\">" + (month + 1) + "月</span>";
+      var firstDay = new Date(year, month, 1).getDay();
+      var daysThisMonth = new Date(year, month + 1, 0).getDate();
+      var daysLastMonth = new Date(year, month, 0).getDate();
+      var body = el("calendarBody");
+      while (body.firstChild) { body.removeChild(body.firstChild); }
+      /* Always six rows, so the dashboard does not jump between months. */
+      for (var row = 0; row < 6; row++) {
+        var tr = document.createElement("tr");
+        for (var col = 0; col < 7; col++) {
+          var index = row * 7 + col;
+          var n = index - firstDay + 1;
+          var td = document.createElement("td");
+          var shown = n;
+          if (n < 1) { shown = daysLastMonth + n; td.className = "muted"; }
+          else if (n > daysThisMonth) { shown = n - daysThisMonth; td.className = "muted"; }
+          else if (n === day) { td.className = "today"; }
+          else if (col === 0) { td.className = "sunday"; }
+          else if (col === 6) { td.className = "saturday"; }
+          var span = document.createElement("span");
+          span.appendChild(document.createTextNode(shown));
+          td.appendChild(span);
+          tr.appendChild(td);
+        }
+        body.appendChild(tr);
+      }
+    }
+    function displayWeather(temperature, code, fetchedAt, cached) {
+      if (typeof temperature !== "number" || !isFinite(temperature)) { return; }
+      setText("temperature", String(Math.round(temperature * 10) / 10));
+      var info = weatherDescriptions[code] || ["天気情報", "☀"];
+      setText("weatherDescription", info[0]);
+      setText("weatherIcon", info[1]);
+      var stamp = new Date(fetchedAt);
+      setText("weatherUpdated", (cached ? "前回取得 " : "更新 ") + two(stamp.getHours()) + ":" + two(stamp.getMinutes()) + (cached ? "（参考）" : ""));
+    }
+    function showWeatherCache() {
+      var cached = safeRead(WEATHER_KEY);
+      /* Do not show a different city's data or data more than 6 hours old. */
+      if (cached && cached.city === s.city && typeof cached.time === "number" && (new Date()).getTime() - cached.time < 6 * 60 * 60 * 1000) {
+        displayWeather(cached.temperature, cached.code, cached.time, true);
+        return true;
+      }
+      return false;
+    }
+    function fetchWeather(force) {
+      if (loadingWeather || !s.weather) { return; }
+      var now = (new Date()).getTime();
+      if (!force && now - lastWeatherRequest < 60 * 1000) { return; }
+      lastWeatherRequest = now;
+      loadingWeather = true;
+      var requestedCity = s.city;
+      var city = cityList[requestedCity];
+      var url = "https://api.open-meteo.com/v1/forecast?latitude=" + city.lat + "&longitude=" + city.lon + "&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
+      var xhr = new XMLHttpRequest();
+      var finished = false;
+      function finish(ok, response) {
+        if (finished) { return; }
+        finished = true;
+        loadingWeather = false;
+        if (requestedCity !== s.city) { fetchWeather(true); return; }
+        if (ok) {
+          try {
+            var json = JSON.parse(response);
+            if (json && json.current && typeof json.current.temperature_2m === "number") {
+              var value = { city: requestedCity, temperature: json.current.temperature_2m, code: json.current.weather_code, time: (new Date()).getTime() };
+              safeWrite(WEATHER_KEY, value);
+              displayWeather(value.temperature, value.code, value.time, false);
+              return;
+            }
+          } catch (e) {}
+        }
+        if (!showWeatherCache()) {
+          setText("temperature", "--");
+          setText("weatherDescription", "取得できません");
+          setText("weatherUpdated", "Wi-Fi・通信環境を確認してください");
+        }
+      }
+      xhr.onreadystatechange = function () { if (xhr.readyState === 4) { finish(xhr.status >= 200 && xhr.status < 300, xhr.responseText); } };
+      xhr.onerror = function () { finish(false, ""); };
+      xhr.ontimeout = function () { finish(false, ""); };
+      try { xhr.open("GET", url, true); xhr.timeout = 12000; xhr.send(null); }
+      catch (e) { finish(false, ""); }
+    }
+    function saveAndApply() {
+      safeWrite(STORAGE_KEY, s);
+      applySettings();
+      updateClock();
+    }
+    function openSettings() { syncInputs(); el("settingsPanel").className = "settings-panel open"; }
+    function closeSettings() { el("settingsPanel").className = "settings-panel"; }
+    function bindCheckbox(id, key) {
+      el(id).addEventListener("change", function () {
+        s[key] = el(id).checked;
+        saveAndApply();
+        if (key === "weather" && s.weather) { showWeatherCache(); fetchWeather(true); }
+      }, false);
+    }
+    function init() {
+      readSettings();
+      applySettings();
+      updateClock();
+      showWeatherCache();
+      fetchWeather(true);
+      setInterval(updateClock, 1000);
+      setInterval(function () { fetchWeather(false); }, 15 * 60 * 1000);
+      el("openSettings").addEventListener("click", openSettings, false);
+      el("closeSettings").addEventListener("click", closeSettings, false);
+      el("refreshWeather").addEventListener("click", function () { fetchWeather(true); }, false);
+      bindCheckbox("settingTime", "time");
+      bindCheckbox("settingYear", "year");
+      bindCheckbox("settingDate", "date");
+      bindCheckbox("settingWeekday", "weekday");
+      bindCheckbox("settingWeather", "weather");
+      bindCheckbox("settingCalendar", "calendar");
+      el("settingClockSize").addEventListener("change", function () { s.clockSize = this.value; saveAndApply(); }, false);
+      el("settingTheme").addEventListener("change", function () { s.theme = this.value; saveAndApply(); }, false);
+      el("settingCity").addEventListener("change", function () {
+        s.city = this.value;
+        saveAndApply();
+        setText("temperature", "--");
+        setText("weatherDescription", "取得しています…");
+        setText("weatherUpdated", "気温を取得中");
+        showWeatherCache();
+        fetchWeather(true);
+      }, false);
+      el("resetSettings").addEventListener("click", function () {
+        s = copyDefaults();
+        syncInputs();
+        saveAndApply();
+        showWeatherCache();
+        fetchWeather(true);
+      }, false);
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) { updateClock(); fetchWeather(false); }
+      }, false);
+    }
+    init();
+  }());
+  </script>
+</body>
+</html>
