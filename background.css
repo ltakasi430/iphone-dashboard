@@ -1,0 +1,20 @@
+/* iPhone 5 (iOS 10) compatible photo background extension. */
+.app { position: relative; z-index: 2; }
+.background-art { display: none; position: fixed; top: -22px; right: -22px; bottom: -22px; left: -22px; z-index: 0; background-repeat: no-repeat; background-size: cover; background-position: center center; pointer-events: none; }
+.background-veil { display: none; position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 1; pointer-events: none; }
+html.photo-active .card { background: rgba(9,25,39,.72); border-color: rgba(124,184,205,.45); }
+html.photo-active .clock-card { background: rgba(11,30,46,.70); }
+html.photo-active body.light .card { background: rgba(250,253,255,.87); border-color: rgba(203,226,235,.85); }
+html.photo-active body.light .clock-card { background: rgba(250,253,255,.89); }
+.background-file { display: block; width: 100%; max-width: 100%; font-size: 13px; color: #d8e9f3; padding: 10px 4px; }
+.background-preview { margin: 8px 4px; height: 100px; border: 1px solid #466277; border-radius: 11px; background-color: #152c3d; background-position: center center; background-size: cover; background-repeat: no-repeat; text-align: center; line-height: 98px; font-size: 12px; color: #abc7d7; }
+.background-status { min-height: 22px; font-size: 12px; color: #b8d4e1; padding: 4px 5px 8px; line-height: 1.5; }
+.background-status.error { color: #ffb2a4; }
+.background-range { width: 107px; vertical-align: middle; }
+.background-range-value { display: inline-block; min-width: 36px; text-align: right; font-size: 12px; color: #b8d4e1; }
+.setting-row.background-option { font-size: 13px; }
+.background-remove { margin: 10px 4px; border: 1px solid #486779; border-radius: 9px; padding: 9px 12px; background: #153044; color: #e5f3fc; }
+.background-remove:disabled { opacity: .45; }
+body.light .background-file, body.light .background-status, body.light .background-range-value { color: #2d5166; }
+body.light .background-status.error { color: #ad4637; }
+body.light .background-remove { color: #24485b; background: #e5f2f7; border-color: #a9c9d7; }
