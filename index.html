@@ -111,8 +111,11 @@
       .calendar-title { margin-bottom: 5px; }
     }
   </style>
+  <link rel="stylesheet" href="background.css">
 </head>
 <body>
+  <div id="backgroundArt" class="background-art" aria-hidden="true"></div>
+  <div id="backgroundVeil" class="background-veil" aria-hidden="true"></div>
   <div class="app">
     <header class="topbar">
       <div class="brand">POCKET <strong>DESK</strong></div>
@@ -166,6 +169,17 @@
       <label class="setting-row">テーマ
         <select id="settingTheme" class="setting-select"><option value="dark">ダーク</option><option value="light">ライト</option></select>
       </label>
+      <div class="setting-heading">背景画像</div>
+      <div class="setting-note">iPhoneの写真から背景を選べます。写真はこの端末だけに保存し、GitHubには送信しません。</div>
+      <input id="backgroundFile" class="background-file" type="file" accept="image/*" aria-label="背景画像を選択">
+      <div id="backgroundPreview" class="background-preview">背景未設定</div>
+      <div id="backgroundStatus" class="background-status" role="status" aria-live="polite"></div>
+      <label class="setting-row background-option">画像の明るさ <span><input id="backgroundBrightness" class="background-range" type="range" min="10" max="100" step="5"><span id="backgroundBrightnessValue" class="background-range-value"></span></span></label>
+      <label class="setting-row background-option">ぼかし <span><input id="backgroundBlur" class="background-range" type="range" min="0" max="16" step="2"><span id="backgroundBlurValue" class="background-range-value"></span></span></label>
+      <label class="setting-row">画像の位置
+        <select id="backgroundPosition" class="setting-select"><option value="top">上寄せ</option><option value="center">中央</option><option value="bottom">下寄せ</option></select>
+      </label>
+      <button id="removeBackground" class="background-remove" type="button">背景画像を削除</button>
       <div class="setting-heading">気温を表示する地域</div>
       <label class="setting-row">地域
         <select id="settingCity" class="setting-select">
@@ -409,5 +423,6 @@
     init();
   }());
   </script>
+  <script src="background.js"></script>
 </body>
 </html>
