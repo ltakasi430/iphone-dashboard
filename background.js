@@ -2,8 +2,10 @@
 (function () {
   "use strict";
   var PHOTO_KEY = "pocket-desk-background-v1";
+  var DEFAULT_PHOTO = "iris-wallpaper-default.jpg";
   var OPTS_KEY = "pocket-desk-background-options-v1";
-  var photo = "";
+  /* Keep personalized photos in localStorage; the bundled Iris image is the default. */
+  var photo = DEFAULT_PHOTO;
   var appliedPhoto = null;
   var options = { brightness: 70, blur: 0, position: "center", framing: "iris" };
   function el(id) { return document.getElementById(id); }
@@ -59,9 +61,9 @@
       veil.style.display = "block";
       preview.textContent = "";
       if (options.framing === "iris") {
-        /* Crop/zoom to keep Iris on the right of the narrow calendar. */
-        art.style.backgroundSize = "auto 120%";
-        art.style.backgroundPosition = "center top";
+        /* The bundled wallpaper is already framed for 320x568; do not overzoom it. */
+        art.style.backgroundSize = photo === DEFAULT_PHOTO ? "cover" : "auto 120%";
+        art.style.backgroundPosition = photo === DEFAULT_PHOTO ? "center bottom" : "center top";
       } else {
         art.style.backgroundSize = "cover";
         art.style.backgroundPosition = "center " + options.position;
@@ -78,7 +80,7 @@
       preview.textContent = "背景未設定";
       appliedPhoto = null;
     }
-    el("removeBackground").disabled = !photo;
+    el("removeBackground").disabled = photo === DEFAULT_PHOTO;
     updateControls();
   }
   function chooseBackground(file) {
@@ -134,10 +136,10 @@
   function removePhoto() {
     try { window.localStorage.removeItem(PHOTO_KEY); }
     catch (e) { status("背景画像を削除できませんでした。", true); return false; }
-    photo = "";
+    photo = DEFAULT_PHOTO;
     el("backgroundFile").value = "";
     paint();
-    status("背景画像を削除しました。", false);
+    status("アイリスの標準背景に戻しました。", false);
     return true;
   }
   function init() {
