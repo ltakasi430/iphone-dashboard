@@ -96,3 +96,70 @@ body.light .topbar:after{background:linear-gradient(90deg,rgba(36,130,160,.35),t
 .calendar td span{width:30px;line-height:30px}
 .calendar td.today span{width:30px;height:30px;line-height:30px}
 }
+
+/* Clock pulse and seconds-only dial; no new animation loops or external libraries. */
+.clock-main{position:relative;min-height:76px}
+.clock-main .clock{position:relative;z-index:2;white-space:nowrap}
+.clock-colon{display:inline-block;min-width:.17em;text-align:center}
+.second-dial{
+  position:absolute;z-index:1;right:12px;top:4px;width:62px;height:62px;
+  border-radius:50%;border:1px solid rgba(141,213,248,.62);
+  background:-webkit-radial-gradient(center,ellipse,rgba(25,58,94,.79) 0%,rgba(8,25,52,.66) 72%,rgba(66,112,150,.26) 100%);
+  background:radial-gradient(circle at center,rgba(25,58,94,.79) 0%,rgba(8,25,52,.66) 72%,rgba(66,112,150,.26) 100%);
+  box-shadow:0 0 18px rgba(45,146,200,.20),inset 0 1px 6px rgba(138,213,247,.17);
+  pointer-events:none
+}
+.second-dial:before{content:"";position:absolute;top:6px;right:6px;bottom:6px;left:6px;border-radius:50%;border:1px solid rgba(117,190,232,.27)}
+.second-tick{position:absolute;display:block;background:rgba(173,223,246,.75);border-radius:2px}
+.second-tick.top{width:2px;height:5px;top:3px;left:29px}
+.second-tick.bottom{width:2px;height:5px;bottom:3px;left:29px}
+.second-tick.left{width:5px;height:2px;top:29px;left:3px}
+.second-tick.right{width:5px;height:2px;top:29px;right:3px}
+.second-hand{
+  position:absolute;top:7px;left:29px;width:2px;height:23px;z-index:2;
+  background:linear-gradient(to top,#6ff4f5,#e1ffff);box-shadow:0 0 8px rgba(100,238,253,.5);
+  -webkit-transform-origin:50% 100%;transform-origin:50% 100%
+}
+.second-pivot{position:absolute;top:26px;left:26px;width:8px;height:8px;z-index:3;border-radius:50%;background:#bcfaff;border:1px solid #3d9ab2;box-shadow:0 0 8px rgba(76,231,246,.65)}
+/* Information-first layout: a wide nearly opaque calendar masks the Iris portrait
+   completely instead of leaving a half-covered face at the narrow card's edge. */
+.calendar-card,html.photo-active .calendar-card{
+  width:100%;max-width:100%;padding:10px 13px 9px;margin-bottom:7px;
+  background:rgba(9,23,46,.975);border-color:rgba(135,211,247,.60);
+  box-shadow:0 5px 28px rgba(0,7,21,.40),inset 0 1px 0 rgba(183,227,248,.16)
+}
+.calendar th{font-size:12px}
+.calendar td{font-size:15px;height:31px}
+.calendar td span{width:29px;line-height:29px}
+.calendar td.today span{width:29px;height:29px;line-height:29px}
+.calendar-card.six-weeks .calendar td{height:28px;font-size:14px}
+body.light .second-dial{background:rgba(232,250,255,.84);border-color:rgba(57,127,169,.65)}
+body.light .second-tick{background:rgba(44,112,152,.75)}
+body.light .second-hand{background:#007bb6}
+body.light .second-pivot{background:#0e92aa}
+body.light .calendar-card,html.photo-active body.light .calendar-card{background:rgba(243,251,255,.98);border-color:rgba(86,162,205,.58)}
+@media(max-width:359px){
+  .clock-main{min-height:73px}
+  .second-dial{width:58px;height:58px;right:7px;top:7px}
+  .second-tick.top,.second-tick.bottom{left:27px}
+  .second-tick.left,.second-tick.right{top:27px}
+  .second-hand{top:7px;left:27px;height:21px}
+  .second-pivot{top:25px;left:25px}
+  .calendar-card,html.photo-active .calendar-card{width:100%;padding:9px 11px 8px}
+  .calendar td{font-size:15px;height:30px}
+}
+@media(max-height:550px){
+  .clock-main{min-height:70px}
+  .calendar-card,html.photo-active .calendar-card{padding-top:8px;padding-bottom:7px}
+  .calendar td{height:28px}
+  .calendar-card.six-weeks .calendar td{height:26px}
+}
+@media(min-width:400px) and (min-height:650px){
+  .clock-main{min-height:87px}
+  .second-dial{width:70px;height:70px;right:18px;top:5px}
+  .second-tick.top,.second-tick.bottom{left:33px}
+  .second-tick.left,.second-tick.right{top:33px}
+  .second-hand{top:8px;left:33px;height:26px}
+  .second-pivot{top:30px;left:30px}
+  .calendar-card,html.photo-active .calendar-card{width:100%}
+}

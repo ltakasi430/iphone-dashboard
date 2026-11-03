@@ -112,7 +112,7 @@
     }
   </style>
   <link rel="stylesheet" href="background.css">
-  <link rel="stylesheet" href="iris-ui.css?v=2">
+  <link rel="stylesheet" href="iris-ui.css?v=4">
 </head>
 <body>
   <div id="backgroundArt" class="background-art" aria-hidden="true"></div>
@@ -125,7 +125,13 @@
     </header>
     <main>
       <section id="clockCard" class="card clock-card" aria-label="現在日時">
-        <div id="time" class="clock">--:--</div>
+        <div class="clock-main">
+          <div id="time" class="clock" aria-live="off"><span id="timeHours">--</span><span id="timeColon" class="clock-colon">:</span><span id="timeMinutes">--</span></div>
+          <div id="secondDial" class="second-dial" role="img" aria-label="秒針のみのアナログ時計">
+            <span class="second-tick top"></span><span class="second-tick right"></span><span class="second-tick bottom"></span><span class="second-tick left"></span>
+            <span id="secondHand" class="second-hand"></span><span class="second-pivot"></span>
+          </div>
+        </div>
         <div id="dateLine" class="date-line">
           <span id="year" class="date-part">2026年</span><span id="date" class="date-part">11月3日</span><span id="weekday" class="date-part">火曜日</span>
         </div>
@@ -163,6 +169,8 @@
       <div class="settings-top"><h1>表示設定</h1><button id="closeSettings" class="done" type="button">完了</button></div>
       <div class="setting-heading">表示する項目（個別にオン・オフできます）</div>
       <label class="setting-row">時計 <input id="settingTime" type="checkbox" checked></label>
+      <label class="setting-row">「：」を点滅 <input id="settingColonBlink" type="checkbox" checked></label>
+      <label class="setting-row">アナログ秒針 <input id="settingSecondDial" type="checkbox" checked></label>
       <label class="setting-row">西暦 <input id="settingYear" type="checkbox" checked></label>
       <label class="setting-row">年月日 <input id="settingDate" type="checkbox" checked></label>
       <label class="setting-row">曜日 <input id="settingWeekday" type="checkbox" checked></label>
@@ -225,7 +233,7 @@
       77: ["雪", "❄"], 80: ["にわか雨", "☂"], 81: ["にわか雨", "☂"], 82: ["強いにわか雨", "☂"],
       85: ["にわか雪", "❄"], 86: ["にわか雪", "❄"], 95: ["雷雨", "⚡"], 96: ["雷雨", "⚡"], 99: ["雷雨", "⚡"]
     };
-    var defaults = { time: true, year: true, date: true, weekday: true, weather: true, calendar: true, iris: true, clockSize: "standard", theme: "dark", city: "kyoto" };
+    var defaults = { time: true, year: true, date: true, weekday: true, weather: true, calendar: true, iris: true, colonBlink: true, secondDial: true, clockSize: "standard", theme: "dark", city: "kyoto" };
     var s = {};
     var calendarMonthOffset = 0;
     var lastDayKey = "";
@@ -254,6 +262,8 @@
     }
     function syncInputs() {
       el("settingTime").checked = s.time;
+      el("settingColonBlink").checked = s.colonBlink;
+      el("settingSecondDial").checked = s.secondDial;
       el("settingYear").checked = s.year;
       el("settingDate").checked = s.date;
       el("settingWeekday").checked = s.weekday;
@@ -271,6 +281,7 @@
       visible("weekday", s.weekday);
       visible("dateLine", s.year || s.date || s.weekday);
       visible("clockCard", s.time || s.year || s.date || s.weekday);
+      visible("secondDial", s.time && s.secondDial);
       visible("weatherCard", s.weather);
       visible("calendarCard", s.calendar);
       visible("irisSignature", s.iris);
@@ -284,9 +295,16 @@
       var minuteKey = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate() + "-" + now.getHours() + "-" + now.getMinutes();
       var dayKey = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate();
       if (minuteKey !== lastMinuteKey) {
-        setText("time", two(now.getHours()) + ":" + two(now.getMinutes()));
+        setText("timeHours", two(now.getHours()));
+        setText("timeMinutes", two(now.getMinutes()));
         lastMinuteKey = minuteKey;
       }
+      /* Blink only the colon; keep the HH:MM digits continuously readable. */
+      el("timeColon").style.opacity = (s.colonBlink && now.getSeconds() % 2 === 1) ? "0.12" : "1";
+      /* The secondary dial has just one hand, driven from the same local clock. */
+      var secondsAngle = "rotate(" + (now.getSeconds() * 6) + "deg)";
+      el("secondHand").style.webkitTransform = secondsAngle;
+      el("secondHand").style.transform = secondsAngle;
       if (dayKey !== lastDayKey) {
         setText("year", now.getFullYear() + "年");
         setText("date", (now.getMonth() + 1) + "月" + now.getDate() + "日");
@@ -429,6 +447,8 @@
       el("closeSettings").addEventListener("click", closeSettings, false);
       el("refreshWeather").addEventListener("click", function () { fetchWeather(true); }, false);
       bindCheckbox("settingTime", "time");
+      bindCheckbox("settingColonBlink", "colonBlink");
+      bindCheckbox("settingSecondDial", "secondDial");
       bindCheckbox("settingYear", "year");
       bindCheckbox("settingDate", "date");
       bindCheckbox("settingWeekday", "weekday");
