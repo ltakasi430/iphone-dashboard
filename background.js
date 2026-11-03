@@ -5,7 +5,7 @@
   var OPTS_KEY = "pocket-desk-background-options-v1";
   var photo = "";
   var appliedPhoto = null;
-  var options = { brightness: 70, blur: 0, position: "center" };
+  var options = { brightness: 70, blur: 0, position: "center", framing: "iris" };
   function el(id) { return document.getElementById(id); }
   function clamp(value, min, max, fallback) {
     var n = Number(value);
@@ -23,6 +23,7 @@
       if (saved && typeof saved === "object") {
         options.brightness = clamp(saved.brightness, 10, 100, 70);
         options.blur = clamp(saved.blur, 0, 16, 0);
+        if (saved.framing === "iris" || saved.framing === "normal") { options.framing = saved.framing; }
         if (saved.position === "top" || saved.position === "center" || saved.position === "bottom") {
           options.position = saved.position;
         }
@@ -37,6 +38,8 @@
     el("backgroundBrightness").value = options.brightness;
     el("backgroundBlur").value = options.blur;
     el("backgroundPosition").value = options.position;
+    el("backgroundFraming").value = options.framing;
+    el("backgroundPosition").disabled = options.framing === "iris";
     el("backgroundBrightnessValue").textContent = options.brightness + "%";
     el("backgroundBlurValue").textContent = options.blur + "px";
   }
@@ -55,7 +58,14 @@
       art.style.display = "block";
       veil.style.display = "block";
       preview.textContent = "";
-      art.style.backgroundPosition = "center " + options.position;
+      if (options.framing === "iris") {
+        /* Crop/zoom to keep Iris on the right of the narrow calendar. */
+        art.style.backgroundSize = "auto 120%";
+        art.style.backgroundPosition = "center top";
+      } else {
+        art.style.backgroundSize = "cover";
+        art.style.backgroundPosition = "center " + options.position;
+      }
       art.style.webkitFilter = "blur(" + options.blur + "px)";
       art.style.filter = "blur(" + options.blur + "px)";
       veil.style.backgroundColor = "rgba(0,0,0," + ((100 - options.brightness) / 100) + ")";
@@ -144,6 +154,10 @@
       options.blur = clamp(this.value, 0, 16, 0);
       saveOptions(); paint();
     }, false);
+    el("backgroundFraming").addEventListener("change", function () {
+      options.framing = this.value === "normal" ? "normal" : "iris";
+      saveOptions(); paint();
+    }, false);
     el("backgroundPosition").addEventListener("change", function () {
       options.position = this.value;
       saveOptions(); paint();
@@ -151,7 +165,7 @@
     el("removeBackground").addEventListener("click", removePhoto, false);
     el("resetSettings").addEventListener("click", function () {
       if (!removePhoto()) { return; }
-      options = { brightness: 70, blur: 0, position: "center" };
+      options = { brightness: 70, blur: 0, position: "center", framing: "iris" };
       saveOptions(); paint();
     }, false);
   }
