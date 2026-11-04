@@ -1,7 +1,7 @@
 # iPhone 5 横置き AI モニター（試作版）
 
-- ページ: https://ltakasi430.github.io/iphone-dashboard/monitor.html
-- 元の `index.html` は変更していません。
+- ページ（既定）: https://ltakasi430.github.io/iphone-dashboard/
+- `index.html` をAIモニターに変更し、元の画面を `classic.html` として保存しました。
 - iOS 10 の古い Safari を想定して、ES5 JavaScript / XMLHttpRequest / 旧式 Flexbox 互換 CSS で実装しています（iPhone 5 実機での最終動作は要確認）。
 - 時計・日付・京都の天気を左側に固定し、右側を **カレンダー / AI利用枠 / 開発状況** の3ページで左右スワイプまたは矢印操作できます。
 - 縦向きにした場合は縦積みレイアウトになります。
@@ -9,17 +9,17 @@
 
 ## iPhone 5で試す手順
 
-1. iPhone 5のSafariで `https://ltakasi430.github.io/iphone-dashboard/monitor.html` を開きます。
+1. iPhone 5のSafariで `https://ltakasi430.github.io/iphone-dashboard/` を開きます。
 2. 横向きにして時計・天気とカレンダーが並ぶか確認します。固定できない場合は本体の画面回転ロックを解除してください。
 3. 右側を左スワイプするとAI利用枠、もう一度左スワイプすると開発状況が出ます。左右の矢印ボタンでも切り替えできます。
-4. 通常画面に戻るには右上の「通常画面」を押してください。
+4. 以前の画面を開くには右上の「旧画面」を押してください。
 5. 常時表示する場合は画面輝度を低めに設定し、端末の温度・バッテリー膨張・電源ケーブルの状態を確認してください。
 
 ## モニターデータの接続
 
 現時点でCodex・OpenAI・Gemini・Modal・Coneco・GitHubの実データ収集は**未実装**です。すべて「未接続」「未取得」と表示し、数値を捏造しません。
 
-`monitor.html` は同じディレクトリにある `monitor.json` だけを **GET** で取得する読み取り専用の設計です。ファイルがない場合（404）は「未接続」のままです。APIキーやGitHubトークンをiPhoneに入力・保存する必要はありません。
+`index.html` と `monitor.html` は同じディレクトリにある `monitor.json` だけを **GET** で取得する読み取り専用の設計です。ファイルがない場合（404）は「未接続」のままです。APIキーやGitHubトークンをiPhoneに入力・保存する必要はありません。
 
 データ形式（すべて任意、数値が取得できないフィールドは `null`）:
 
