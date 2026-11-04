@@ -1,5 +1,7 @@
 # Pocket Desk – iPhone 5用ダッシュボード
 
+> 2026-11-05更新：トップページ `index.html` はiPhone 5横置きAIモニターです。元の時計・カレンダー画面は [`classic.html`](./classic.html) に残してあります。詳しくは [`MONITOR_README.md`](./MONITOR_README.md) を参照してください。
+
 iOS 10 Safari を想定した、外部ライブラリ不要・1ページ完結のダッシュボードです。
 
 ## 表示内容
