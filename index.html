@@ -269,11 +269,17 @@
     $("dev-updated").textContent = fmtDateTime(j.updated_at) + " 時点";
   }
 
+  var MONITOR_URL = "https://pocketdesk-monitor.hasse430.workers.dev/monitor.json";
   function fetchMonitor(){
-    fetch("monitor.json?t=" + Date.now()).then(function(r){
+    fetch(MONITOR_URL + "?t=" + Date.now()).then(function(r){
       if (!r.ok) throw new Error("not ok");
       return r.json();
-    }).then(renderMonitor).catch(function(){ /* 未接続表示のまま */ });
+    }).then(renderMonitor).catch(function(){
+      fetch("monitor.json?t=" + Date.now()).then(function(r){
+        if (!r.ok) throw new Error("not ok");
+        return r.json();
+      }).then(renderMonitor).catch(function(){ /* 未接続表示のまま */ });
+    });
   }
 
   /* ---------- burn-in countermeasures ---------- */

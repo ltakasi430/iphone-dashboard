@@ -8,6 +8,16 @@
 - `monitor.json` の形式に `muse` ブロックを追加した: `plan` / `weekly_remaining_pct`（残量%）/ `weekly_reset_at` / `extra_pool_left`。また `services.coneco` に `lines`（開発状況の短い行の配列、任意）を追加した。
 - データ収集役はモカ（Muse）が担当する。初回の `monitor.json` はモカの実測値（Muse週間枠・Coneco開発状況・GitHub）を投入済みで、Codex / OpenAI / Gemini / Modal は未取得のため null。
 
+## 自動収集（2026-11-09 実装）
+
+- 配信は Cloudflare Worker `pocketdesk-monitor`（https://pocketdesk-monitor.hasse430.workers.dev/monitor.json）が担う。Galaxy 版 `index.html` はこちらを優先して読み、失敗時のみリポジトリ内の `monitor.json` にフォールバックする。
+- 収集はモカの VM 上のプログラム（`pocketdesk-collector`、systemd タイマーで30分ごと）が担当し、AI は介在しない。収集対象はプログラムで取得できるものだけ:
+  - Muse: 週間枠の残り%・リセット時刻・追加トークンプール（`subscription-status` の出力から算出）
+  - Coneco 開発状況: 開発ステータスファイル（15分周期で更新）の「いま実行中」「直近の完了」を転記。新しさが45分を超えたら `warn` になる
+  - GitHub 状態は Coneco 開発ステータスの鮮度に連動
+- Codex の枠・OpenAI クレジット・Gemini・Modal は、プログラムで取得する手段がないため実装しない（常に null = 「未取得」表示）。
+- Worker への書き込みは更新キー必須。データ自体は従来どおり公開前提の集計値のみ。
+
 - ページ（既定）: https://ltakasi430.github.io/iphone-dashboard/
 - `index.html` をAIモニターに変更し、元の画面を `classic.html` として保存しました。
 - iOS 10 の古い Safari を想定して、ES5 JavaScript / XMLHttpRequest / 旧式 Flexbox 互換 CSS で実装しています（iPhone 5 実機での最終動作は要確認）。
