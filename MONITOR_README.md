@@ -1,5 +1,13 @@
 # iPhone 5 横置き AI モニター（試作版）
 
+## 2026-11-09 Galaxy 版への移行
+
+- `index.html` を **Galaxy S7 Edge 向けモニター**に変更した（横置き・大画面前提）。従来の iPhone 5 向けモニターは `iphone.html` として保全してある（`classic.html` は従来どおり）。
+- 壁紙は `iris-wallpaper-galaxy.jpg`（アイリス衣装Aを右側に配置し、左側を情報表示用に空けた構図）。
+- 有機ELの焼き付き対策として、画面全体のピクセルシフト（1分ごと）**と**夜間（23時〜6時）の減光を入れてある。
+- `monitor.json` の形式に `muse` ブロックを追加した: `plan` / `weekly_remaining_pct`（残量%）/ `weekly_reset_at` / `extra_pool_left`。また `services.coneco` に `lines`（開発状況の短い行の配列、任意）を追加した。
+- データ収集役はモカ（Muse）が担当する。初回の `monitor.json` はモカの実測値（Muse週間枠・Coneco開発状況・GitHub）を投入済みで、Codex / OpenAI / Gemini / Modal は未取得のため null。
+
 - ページ（既定）: https://ltakasi430.github.io/iphone-dashboard/
 - `index.html` をAIモニターに変更し、元の画面を `classic.html` として保存しました。
 - iOS 10 の古い Safari を想定して、ES5 JavaScript / XMLHttpRequest / 旧式 Flexbox 互換 CSS で実装しています（iPhone 5 実機での最終動作は要確認）。

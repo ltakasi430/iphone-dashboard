@@ -1,363 +1,298 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Iris Monitor">
-  <meta name="theme-color" content="#081525">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <title>Iris Monitor | iPhone 5</title>
-  <style>
-    * { -webkit-box-sizing: border-box; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #081525; color: #f2faff; }
-    body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; -webkit-text-size-adjust: 100%; }
-    button, a { -webkit-tap-highlight-color: transparent; }
-    button { font-family: inherit; -webkit-appearance: none; appearance: none; cursor: pointer; }
-    .wallpaper, .shade { position: fixed; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; }
-    .wallpaper { z-index: 0; background: #0b213b url("iris-wallpaper-default.jpg") center center / cover no-repeat; opacity: .47; }
-    .shade { z-index: 0; background: -webkit-linear-gradient(left, rgba(4,12,24,.87), rgba(7,18,35,.70) 65%, rgba(8,19,37,.68)); background: linear-gradient(90deg, rgba(4,12,24,.87), rgba(7,18,35,.70) 65%, rgba(8,19,37,.68)); }
-    .shell { position: relative; z-index: 1; width: 100%; height: 100%; max-width: 960px; margin: 0 auto; padding: 6px 9px 8px; }
-    .topbar { height: 26px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-pack: justify; -webkit-justify-content: space-between; justify-content: space-between; -webkit-box-align: center; -webkit-align-items: center; align-items: center; }
-    .brand { font-size: 10px; font-weight: bold; letter-spacing: 1.8px; color: #b9dafa; }
-    .brand strong { color: #68edeb; }
-    .back { color: #bed9ea; font-size: 10px; text-decoration: none; border: 1px solid rgba(140,202,246,.35); border-radius: 9px; padding: 4px 8px; background: rgba(11,26,47,.5); }
-    .stage { display: -webkit-box; display: -webkit-flex; display: flex; height: -webkit-calc(100% - 28px); height: calc(100% - 28px); }
-    .left { width: 40%; -webkit-box-flex: 0; -webkit-flex: 0 0 40%; flex: 0 0 40%; min-width: 0; padding: 7px 10px 0 2px; }
-    .clock-area { position: relative; padding-right: 48px; margin-bottom: 5px; min-height: 90px; border-bottom: 1px solid rgba(106,215,237,.29); }
-    .time { font-size: 55px; font-weight: 300; line-height: 1.1; letter-spacing: -2px; white-space: nowrap; font-variant-numeric: tabular-nums; text-shadow: 0 0 14px rgba(182,238,255,.18); }
-    .colon { display: inline-block; min-width: .17em; }
-    .date { margin: 3px 0 7px; font-size: 11px; color: #cfe4f4; white-space: nowrap; }
-    .date .weekday { color: #79e5db; }
-    .second-dial { position: absolute; width: 43px; height: 43px; right: 2px; top: 7px; border: 1px solid rgba(146,213,249,.55); border-radius: 50%; background: rgba(18,48,79,.47); box-shadow: inset 0 0 10px rgba(164,220,255,.12); }
-    .second-hand { position: absolute; width: 2px; height: 16px; left: 20px; top: 5px; background: #83f2f0; -webkit-transform-origin: 50% 100%; transform-origin: 50% 100%; }
-    .second-pivot { position: absolute; width: 6px; height: 6px; left: 18px; top: 18px; border-radius: 50%; background: #d3fbff; }
-    .weather { padding: 9px 10px 8px; border: 1px solid rgba(138,197,229,.34); background: rgba(15,36,62,.67); border-radius: 14px; }
-    .weather-label { font-size: 9px; color: #aac8da; }
-    .temperature { margin-top: 3px; font-size: 29px; font-weight: 300; line-height: 1; }
-    .city { font-size: 10px; color: #c6e2ee; margin-top: 4px; }
-    .right { width: 60%; min-width: 0; height: 100%; -webkit-box-flex: 1; -webkit-flex: 1 1 auto; flex: 1 1 auto; }
-    .frame { height: 100%; border: 1px solid rgba(129,199,238,.41); border-radius: 17px; overflow: hidden; background: rgba(8,24,46,.79); box-shadow: 0 2px 17px rgba(4,13,29,.21); }
-    .panel-top { height: 33px; padding: 0 8px; border-bottom: 1px solid rgba(138,196,230,.25); display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-pack: justify; -webkit-justify-content: space-between; justify-content: space-between; -webkit-box-align: center; -webkit-align-items: center; align-items: center; }
-    .panel-title { font-size: 12px; font-weight: 700; }
-    .page-mark { color: #81e5df; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
-    .panel-actions { white-space: nowrap; }
-    .panel-actions button { background: rgba(39,80,115,.55); border: 1px solid rgba(152,209,239,.30); color: #edf9ff; border-radius: 8px; width: 27px; height: 25px; padding: 0; font-size: 18px; line-height: 20px; margin-left: 4px; }
-    .page-area { height: -webkit-calc(100% - 33px); height: calc(100% - 33px); padding: 6px 9px 5px; overflow: hidden; }
-    .page { display: none; }
-    .page.active { display: block; }
-    .calendar-head { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-pack: justify; -webkit-justify-content: space-between; justify-content: space-between; -webkit-box-align: center; -webkit-align-items: center; align-items: center; margin-bottom: 2px; }
-    .calendar-month { font-size: 12px; font-weight: bold; }
-    .calendar-nav button { width: 25px; height: 24px; padding: 0; border: 0; color: #d9f4ff; font-size: 19px; background: transparent; }
-    .calendar { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    .calendar th { font-size: 9px; height: 18px; color: #b4d2e3; font-weight: 500; }
-    .calendar td { text-align: center; padding: 0; height: 23px; font-size: 11px; }
-    .calendar td span { display: inline-block; min-width: 21px; height: 21px; line-height: 21px; border-radius: 50%; }
-    .calendar .muted { color: #637b93; }
-    .calendar .sun { color: #edabb2; }
-    .calendar .sat { color: #92c7ff; }
-    .calendar .today span { background: #74e3e9; color: #092439; font-weight: 800; }
-    .hint { color: #8daec4; font-size: 9px; text-align: center; margin: 4px 0 0; }
-    .usage-title { font-size: 10px; color: #a9cada; margin-top: 5px; }
-    .usage-row { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-pack: justify; -webkit-justify-content: space-between; justify-content: space-between; -webkit-box-align: center; -webkit-align-items: center; align-items: center; margin-top: 2px; }
-    .usage-row b { font-size: 11px; font-weight: 600; }
-    .usage-row strong { font-size: 15px; color: #a5f6d4; font-weight: 700; }
-    .meter { width: 100%; height: 6px; overflow: hidden; border-radius: 8px; margin-top: 4px; background: rgba(110,151,181,.24); }
-    .meter-fill { width: 0; height: 100%; background: #6edbb5; border-radius: 8px; }
-    .meter-fill.warn { background: #f1c371; }
-    .meter-fill.low { background: #ed8585; }
-    .reset { font-size: 9px; color: #9fb7c7; margin-top: 2px; min-height: 11px; }
-    .tile-wrap { margin-top: 7px; overflow: hidden; }
-    .tile { float: left; width: 32%; margin-right: 2%; padding: 6px 4px; border-radius: 8px; background: rgba(39,75,106,.45); min-height: 49px; }
-    .tile:last-child { margin-right: 0; }
-    .tile-name { font-size: 9px; color: #bcd4e3; }
-    .tile-value { margin-top: 4px; font-size: 11px; font-weight: 700; color: #e9fbff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .updated { clear: both; padding-top: 6px; font-size: 9px; color: #9cb9c8; }
-    .status-row { height: 47px; border-bottom: 1px solid rgba(131,184,214,.17); display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-pack: justify; -webkit-justify-content: space-between; justify-content: space-between; -webkit-box-align: center; -webkit-align-items: center; align-items: center; }
-    .status-row b { display: block; font-size: 12px; margin-bottom: 3px; }
-    .status-detail { font-size: 9px; color: #9fb7cb; }
-    .state { font-size: 10px; color: #a7b9c9; text-align: right; }
-    .state.ok { color: #83eac9; }
-    .state.warn { color: #ffd187; }
-    .state.error { color: #f3a2a2; }
-    .status-note { margin-top: 8px; font-size: 10px; color: #aec6d7; line-height: 1.5; }
-    @media (orientation: portrait) {
-      html, body { height: auto; min-height: 100%; overflow: auto; }
-      .shell { height: auto; min-height: 100vh; padding: 8px 12px 12px; }
-      .stage { display: block; height: auto; }
-      .left, .right { width: 100%; padding-right: 0; }
-      .left { padding-top: 7px; }
-      .clock-area { min-height: 105px; padding-right: 60px; }
-      .time { font-size: 66px; }
-      .second-dial { width: 48px; height: 48px; right: 4px; }
-      .second-hand { height: 18px; left: 22px; }
-      .second-pivot { left: 20px; top: 20px; }
-      .weather { margin-bottom: 8px; padding: 8px 10px; }
-      .right { height: 279px; }
-      .tile { min-height: 53px; }
-      .calendar td { height: 25px; }
-    }
-    @media (orientation: landscape) and (max-height: 295px) {
-      .time { font-size: 46px; }
-      .clock-area { min-height: 79px; }
-      .weather { padding: 7px; }
-      .calendar td { height: 19px; font-size: 10px; }
-      .calendar td span { height: 18px; line-height: 18px; }
-      .status-row { height: 39px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pocket Desk – Galaxy Monitor</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+    background:#04070d;
+    color:#e8f4f8;
+    overflow:hidden;
+    -webkit-user-select:none; user-select:none;
+  }
+  #bg {
+    position:fixed; inset:0;
+    background:url('iris-wallpaper-galaxy.jpg') no-repeat right center;
+    background-size:cover;
+    z-index:0;
+  }
+  #bgshade {
+    position:fixed; inset:0; z-index:1;
+    background:linear-gradient(90deg, rgba(3,8,16,.88) 0%, rgba(3,8,16,.72) 46%, rgba(3,8,16,.18) 78%, rgba(3,8,16,.05) 100%);
+  }
+  #nightdim {
+    position:fixed; inset:0; z-index:3; background:#000; opacity:0;
+    pointer-events:none; transition:opacity 2s;
+  }
+  body.night #nightdim { opacity:.38; }
+  body.night #bg { filter:brightness(.75); }
+
+  #shift { position:relative; z-index:2; height:100%; transition:transform 1.2s ease; }
+  #layout {
+    display:flex; gap:1.6vw; height:100%;
+    padding:2.2vh 2.2vw;
+  }
+  #left { flex:0 0 55%; display:flex; flex-direction:column; gap:1.8vh; min-width:0; }
+  #right { flex:1; display:flex; flex-direction:column; gap:1.8vh; min-width:0; }
+
+  /* clock */
+  #clockbox { padding:0.4vh 0.4vw; }
+  #clock {
+    font-size:19vh; line-height:1; font-weight:200; letter-spacing:.01em;
+    color:#f4fbff; text-shadow:0 2px 18px rgba(0,229,255,.25);
+    font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  #clock .colon { display:inline-block; }
+  #clock .colon.off { opacity:.15; }
+  #dateline { margin-top:0.8vh; font-size:3.4vh; color:#bfe9f5; }
+  #dateline .dow { color:#41d9ee; margin-left:.5em; }
+  #weather { margin-top:0.4vh; font-size:3vh; color:#9fd8e8; }
+  #weather .temp { color:#fff; font-size:3.6vh; }
+
+  /* panels */
+  .panel {
+    background:rgba(6,18,30,.62);
+    border:1px solid rgba(65,217,238,.28);
+    border-radius:1.4vh;
+    padding:1.5vh 1.2vw;
+    backdrop-filter: blur(2px);
+  }
+  .panel h2 {
+    font-size:2.5vh; font-weight:600; color:#41d9ee; letter-spacing:.12em;
+    margin-bottom:1vh; display:flex; align-items:center; gap:.6em;
+  }
+  .panel h2 .sub { margin-left:auto; font-size:2vh; color:#8fb8c4; letter-spacing:0; font-weight:400; }
+
+  .bigpct { display:flex; align-items:baseline; gap:1vw; }
+  .bigpct .num { font-size:7.2vh; font-weight:200; color:#fff; line-height:1; }
+  .bigpct .lbl { font-size:2.4vh; color:#bfe9f5; }
+  .bar { height:1.1vh; border-radius:.6vh; background:rgba(255,255,255,.12); margin:1vh 0 .6vh; overflow:hidden; }
+  .bar > i { display:block; height:100%; background:linear-gradient(90deg,#1899b2,#41d9ee); border-radius:.6vh; }
+  .bar.warn > i { background:linear-gradient(90deg,#b26a18,#eeb041); }
+  .bar.bad > i { background:linear-gradient(90deg,#b21818,#ee4141); }
+  .kv { display:flex; justify-content:space-between; font-size:2.3vh; color:#cfeef7; padding:.35vh 0; }
+  .kv b { color:#fff; font-weight:600; font-variant-numeric:tabular-nums; }
+  .na { color:#6f8b96; }
+
+  .qrow { display:flex; align-items:center; gap:.8vw; padding:.5vh 0; font-size:2.3vh; }
+  .qrow .name { flex:0 0 34%; color:#cfeef7; }
+  .qrow .bar { flex:1; margin:0; }
+  .qrow .val { flex:0 0 18%; text-align:right; color:#fff; font-variant-numeric:tabular-nums; }
+
+  .dot { display:inline-block; width:1.4vh; height:1.4vh; border-radius:50%; background:#5a6d75; vertical-align:middle; }
+  .dot.ok { background:#39e08c; box-shadow:0 0 8px rgba(57,224,140,.8); }
+  .dot.warn { background:#eeb041; box-shadow:0 0 8px rgba(238,176,65,.8); }
+  .dot.error { background:#ee4141; box-shadow:0 0 8px rgba(238,65,65,.8); }
+  #devlines { font-size:2.35vh; line-height:1.5; color:#e6f6fb; }
+  #devlines div { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #devdetail { font-size:2.1vh; color:#9fd8e8; margin-bottom:.6vh; }
+
+  /* calendar */
+  #cal table { width:100%; border-collapse:collapse; font-size:2.2vh; text-align:center; }
+  #cal th { color:#41d9ee; font-weight:600; padding:.3vh 0; }
+  #cal td { color:#d7edf4; padding:.32vh 0; font-variant-numeric:tabular-nums; }
+  #cal td.today { background:rgba(65,217,238,.28); border-radius:50%; color:#fff; font-weight:700; }
+  #cal td.dim { color:#55707b; }
+  #cal td.sun { color:#f0a3a3; } #cal td.sat { color:#a3c8f0; }
+
+  #footer {
+    margin-top:auto; display:flex; justify-content:space-between; align-items:baseline;
+    font-size:1.9vh; color:#7fa6b3; padding:0 .4vw;
+  }
+  #footer a { color:#7fa6b3; text-decoration:none; }
+
+  #spacer-iris { flex:1; min-height:6vh; }
+
+  @media (orientation: portrait) {
+    #layout { flex-direction:column; overflow-y:auto; }
+    #left, #right { flex:none; }
+    #clock { font-size:16vw; }
+    .bigpct .num { font-size:12vw; }
+  }
+</style>
 </head>
 <body>
-  <div class="wallpaper"></div><div class="shade"></div>
-  <div class="shell">
-    <header class="topbar">
-      <div class="brand">IRIS <strong>MONITOR</strong> · POCKET DESK</div>
-      <a class="back" href="./classic.html" aria-label="元のダッシュボードを表示">旧画面</a>
-    </header>
-    <div class="stage">
-      <section class="left" aria-label="時計と天気">
-        <div class="clock-area">
-          <div class="time"><span id="hours">--</span><span id="colon" class="colon">:</span><span id="minutes">--</span></div>
-          <div class="second-dial" aria-label="秒針">
-            <span id="secondHand" class="second-hand"></span><span class="second-pivot"></span>
-          </div>
-          <div id="dateLine" class="date">----年 --月--日</div>
-        </div>
-        <div class="weather">
-          <div class="weather-label">KYOTO · WEATHER</div>
-          <div class="temperature"><span id="temperature">--</span>°</div>
-          <div id="weatherDescription" class="city">天気を取得中…</div>
-        </div>
-      </section>
-      <section class="right" aria-label="スワイプ切り替えパネル">
-        <div class="frame">
-          <div class="panel-top">
-            <span id="panelTitle" class="panel-title">カレンダー</span>
-            <span id="panelMark" class="page-mark">1 / 3</span>
-            <span class="panel-actions">
-              <button id="pagePrev" type="button" aria-label="前のページ">&#8249;</button>
-              <button id="pageNext" type="button" aria-label="次のページ">&#8250;</button>
-            </span>
-          </div>
-          <div id="pageArea" class="page-area">
-            <div id="calendarPage" class="page active">
-              <div class="calendar-head">
-                <span id="calendarMonth" class="calendar-month">----</span>
-                <span class="calendar-nav">
-                  <button id="monthPrev" type="button" aria-label="前の月">&#8249;</button>
-                  <button id="monthNext" type="button" aria-label="次の月">&#8250;</button>
-                </span>
-              </div>
-              <table class="calendar" aria-label="月間カレンダー">
-                <thead><tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr></thead>
-                <tbody id="calendarBody"></tbody>
-              </table>
-              <p class="hint">左右スワイプで表示を切り替え</p>
-            </div>
-            <div id="usagePage" class="page">
-              <div class="usage-row"><b>Codex · 5時間枠</b><strong id="codexFive">未接続</strong></div>
-              <div class="meter"><div id="codexFiveFill" class="meter-fill"></div></div>
-              <div class="reset" id="codexReset">残量データを待機中</div>
-              <div class="usage-row"><b>Codex · 週次枠</b><strong id="codexWeek">未接続</strong></div>
-              <div class="meter"><div id="codexWeekFill" class="meter-fill"></div></div>
-              <div class="tile-wrap">
-                <div class="tile"><div class="tile-name">OpenAI API</div><div id="openaiCredit" class="tile-value">未接続</div></div>
-                <div class="tile"><div class="tile-name">Gemini</div><div id="geminiQuota" class="tile-value">未接続</div></div>
-                <div class="tile"><div class="tile-name">Modal</div><div id="modalCredit" class="tile-value">未接続</div></div>
-              </div>
-              <div id="monitorUpdated" class="updated">表示用データは未接続です</div>
-            </div>
-            <div id="statusPage" class="page">
-              <div class="status-row">
-                <div><b>Coneco</b><div id="conecoDetail" class="status-detail">接続待ち</div></div>
-                <span id="conecoStatus" class="state">未接続</span>
-              </div>
-              <div class="status-row">
-                <div><b>GitHub 開発</b><div id="githubDetail" class="status-detail">接続待ち</div></div>
-                <span id="githubStatus" class="state">未接続</span>
-              </div>
-              <div class="status-row">
-                <div><b>API / バックエンド</b><div id="apiDetail" class="status-detail">接続待ち</div></div>
-                <span id="apiStatus" class="state">未接続</span>
-              </div>
-              <p class="status-note">端末にはAPIキーを保存しません。情報は読み取り専用の表示データから取得します。</p>
-            </div>
-          </div>
-        </div>
-      </section>
+<div id="bg"></div>
+<div id="bgshade"></div>
+<div id="nightdim"></div>
+
+<div id="shift">
+  <div id="layout">
+    <div id="left">
+      <div id="clockbox">
+        <div id="clock">--<span class="colon" id="colon">:</span>--</div>
+        <div id="dateline"><span id="date">----/--/--</span><span class="dow" id="dow"></span></div>
+        <div id="weather">京都 <span class="temp" id="wtemp">--°</span> <span id="wdesc">取得中…</span></div>
+      </div>
+
+      <div class="panel" id="claude-panel">
+        <h2>Muse <span class="sub" id="claude-plan">Power</span></h2>
+        <div class="bigpct"><span class="num" id="claude-pct">--%</span><span class="lbl">週間枠の残り</span></div>
+        <div class="bar" id="claude-bar"><i style="width:0%"></i></div>
+        <div class="kv"><span>リセット</span><b id="claude-reset">—</b></div>
+        <div class="kv"><span>追加トークンプール</span><b id="claude-pool">—</b></div>
+      </div>
+
+      <div class="panel" id="quota-panel">
+        <h2>AI利用枠 <span class="sub">Codex / API / Gemini / Modal</span></h2>
+        <div id="quotas"></div>
+      </div>
+    </div>
+
+    <div id="right">
+      <div id="spacer-iris"></div>
+      <div class="panel" id="dev-panel">
+        <h2><span class="dot" id="dev-dot"></span>Coneco 開発状況 <span class="sub" id="dev-updated"></span></h2>
+        <div id="devdetail">未接続</div>
+        <div id="devlines"></div>
+      </div>
+      <div class="panel" id="cal">
+        <h2 id="cal-title">カレンダー</h2>
+        <div id="cal-body"></div>
+      </div>
+      <div id="footer">
+        <span>Pocket Desk – Galaxy Monitor</span>
+        <span>データ更新 <span id="updated">—</span> ／ <a href="iphone.html">iPhone版</a> ・ <a href="classic.html">旧画面</a></span>
+      </div>
     </div>
   </div>
-  <script>
-  (function () {
-    "use strict";
-    var titles = ["カレンダー", "AI 利用枠", "開発状況"];
-    var pages = ["calendarPage", "usagePage", "statusPage"];
-    var dayNames = ["日", "月", "火", "水", "木", "金", "土"];
-    var pageIndex = 0;
-    var monthOffset = 0;
-    var lastDay = "";
-    var touchStartX = 0;
-    var touchStartY = 0;
+</div>
 
-    function el(id) { return document.getElementById(id); }
-    function two(n) { return n < 10 ? "0" + n : "" + n; }
-    function set(id, value) { el(id).textContent = String(value); }
-    function showPage(next) {
-      if (next < 0) { next = pages.length - 1; }
-      if (next >= pages.length) { next = 0; }
-      pageIndex = next;
-      var i;
-      for (i = 0; i < pages.length; i++) {
-        el(pages[i]).className = "page" + (i === pageIndex ? " active" : "");
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var DOW = ["日","月","火","水","木","金","土"];
+
+  /* ---------- clock ---------- */
+  function pad(n){ return (n<10?"0":"")+n; }
+  function tickClock(){
+    var now = new Date();
+    var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+    $("clock").firstChild.nodeValue = pad(h);
+    $("clock").lastChild.nodeValue = pad(m);
+    $("colon").className = "colon" + (s % 2 ? " off" : "");
+    $("date").textContent = now.getFullYear() + "/" + pad(now.getMonth()+1) + "/" + pad(now.getDate());
+    $("dow").textContent = "(" + DOW[now.getDay()] + ")";
+    document.body.className = (h >= 23 || h < 6) ? "night" : "";
+  }
+
+  /* ---------- calendar ---------- */
+  function buildCal(){
+    var now = new Date(), y = now.getFullYear(), mo = now.getMonth(), today = now.getDate();
+    $("cal-title").textContent = y + "年" + (mo+1) + "月";
+    var first = new Date(y, mo, 1).getDay();
+    var days = new Date(y, mo+1, 0).getDate();
+    var html = "<table><tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr><tr>";
+    var i, cell = 0;
+    for (i=0;i<first;i++){ html += "<td></td>"; cell++; }
+    for (var d=1; d<=days; d++){
+      var dow = (first + d - 1) % 7;
+      var cls = (d===today) ? "today" : (dow===0 ? "sun" : (dow===6 ? "sat" : ""));
+      html += '<td class="' + cls + '">' + d + "</td>"; cell++;
+      if (cell % 7 === 0 && d < days) html += "</tr><tr>";
+    }
+    html += "</tr></table>";
+    $("cal-body").innerHTML = html;
+  }
+
+  /* ---------- weather (Kyoto, Open-Meteo) ---------- */
+  var WDESC = {0:"快晴",1:"晴れ",2:"一部曇り",3:"曇り",45:"霧",48:"霧",51:"小雨",53:"小雨",55:"小雨",61:"雨",63:"雨",65:"大雨",71:"雪",73:"雪",75:"大雪",80:"にわか雨",81:"にわか雨",82:"激しいにわか雨",95:"雷雨"};
+  function fetchWeather(){
+    var url = "https://api.open-meteo.com/v1/forecast?latitude=35.0116&longitude=135.7681&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
+    fetch(url).then(function(r){ return r.json(); }).then(function(j){
+      if (j && j.current){
+        $("wtemp").textContent = Math.round(j.current.temperature_2m) + "°";
+        $("wdesc").textContent = WDESC[j.current.weather_code] || "";
       }
-      set("panelTitle", titles[pageIndex]);
-      set("panelMark", (pageIndex + 1) + " / " + pages.length);
-    }
-    function tick() {
-      var now = new Date();
-      set("hours", two(now.getHours()));
-      set("minutes", two(now.getMinutes()));
-      el("colon").style.opacity = now.getSeconds() % 2 ? ".28" : "1";
-      var angle = "rotate(" + now.getSeconds() * 6 + "deg)";
-      el("secondHand").style.webkitTransform = angle;
-      el("secondHand").style.transform = angle;
-      var dateKey = now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate();
-      if (dateKey !== lastDay) {
-        set("dateLine", now.getFullYear() + "年 " + (now.getMonth() + 1) + "月" + now.getDate() + "日 " + dayNames[now.getDay()] + "曜日");
-        drawCalendar();
-        lastDay = dateKey;
-      }
-    }
-    function drawCalendar() {
-      var now = new Date();
-      var month = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
-      var year = month.getFullYear(), mm = month.getMonth();
-      set("calendarMonth", year + "年 " + (mm + 1) + "月");
-      var first = month.getDay();
-      var days = new Date(year, mm + 1, 0).getDate();
-      var prev = new Date(year, mm, 0).getDate();
-      var weeks = Math.max(5, Math.ceil((first + days) / 7));
-      var tbody = el("calendarBody");
-      while (tbody.firstChild) { tbody.removeChild(tbody.firstChild); }
-      var row, col;
-      for (row = 0; row < weeks; row++) {
-        var tr = document.createElement("tr");
-        for (col = 0; col < 7; col++) {
-          var d = row * 7 + col - first + 1;
-          var td = document.createElement("td");
-          var n = d;
-          if (d < 1) { n = prev + d; td.className = "muted"; }
-          else if (d > days) { n = d - days; td.className = "muted"; }
-          else if (monthOffset === 0 && d === now.getDate()) { td.className = "today"; }
-          else if (col === 0) { td.className = "sun"; }
-          else if (col === 6) { td.className = "sat"; }
-          var span = document.createElement("span");
-          span.appendChild(document.createTextNode(n));
-          td.appendChild(span); tr.appendChild(td);
-        }
-        tbody.appendChild(tr);
-      }
-    }
-    function fetchWeather() {
-      var req = new XMLHttpRequest();
-      req.open("GET", "https://api.open-meteo.com/v1/forecast?latitude=35.0116&longitude=135.7681&current=temperature_2m,weather_code&timezone=Asia%2FTokyo", true);
-      req.onreadystatechange = function () {
-        if (req.readyState !== 4) { return; }
-        if (req.status >= 200 && req.status < 300) {
-          try {
-            var result = JSON.parse(req.responseText).current;
-            if (result && typeof result.temperature_2m === "number") {
-              set("temperature", Math.round(result.temperature_2m));
-              var code = Number(result.weather_code);
-              var desc = code < 3 ? "京都 · 晴れ" : (code < 50 ? "京都 · くもり" : (code < 70 ? "京都 · 雨" : "京都 · 天気情報"));
-              set("weatherDescription", desc);
-              return;
-            }
-          } catch (e) {}
-        }
-        set("weatherDescription", "京都 · 気温取得不可");
-      };
-      req.onerror = function () { set("weatherDescription", "京都 · 通信エラー"); };
-      req.send();
-    }
-    function validPercent(value) { return typeof value === "number" && isFinite(value) && value >= 0 && value <= 100; }
-    function percent(displayId, fillId, n) {
-      if (!validPercent(n)) { set(displayId, "未取得"); el(fillId).style.width = "0"; return; }
-      var p = Math.round(n);
-      set(displayId, p + "%");
-      el(fillId).style.width = p + "%";
-      el(fillId).className = "meter-fill" + (p <= 10 ? " low" : (p <= 20 ? " warn" : ""));
-    }
-    function usd(id, n) {
-      set(id, typeof n === "number" && isFinite(n) && n >= 0 ? "$" + n.toFixed(2) : "未取得");
-    }
-    function service(id, detailId, data) {
-      var state = data && data.status;
-      var label = state === "ok" ? "正常" : (state === "warn" ? "注意" : (state === "error" ? "異常" : "未取得"));
-      var node = el(id);
-      node.className = "state" + ((state === "ok" || state === "warn" || state === "error") ? " " + state : "");
-      set(id, label);
-      set(detailId, data && typeof data.detail === "string" ? data.detail.slice(0, 60) : "取得データなし");
-    }
-    function renderMonitor(data) {
-      if (!data || typeof data !== "object") { return; }
-      var codex = data.codex || {}, openai = data.openai || {}, gemini = data.gemini || {}, modal = data.modal || {}, systems = data.services || {};
-      percent("codexFive", "codexFiveFill", codex.five_hour_remaining_pct);
-      percent("codexWeek", "codexWeekFill", codex.weekly_remaining_pct);
-      set("codexReset", typeof codex.five_hour_reset_at === "string" ? "5時間枠リセット: " + codex.five_hour_reset_at.slice(0, 30) : "リセット時刻: 未取得");
-      usd("openaiCredit", openai.credit_remaining_usd);
-      set("geminiQuota", validPercent(gemini.remaining_pct) ? Math.round(gemini.remaining_pct) + "%" : "未取得");
-      usd("modalCredit", modal.credit_remaining_usd);
-      service("conecoStatus", "conecoDetail", systems.coneco);
-      service("githubStatus", "githubDetail", systems.github);
-      service("apiStatus", "apiDetail", systems.api);
-      set("monitorUpdated", typeof data.updated_at === "string" ? "データ更新: " + data.updated_at.slice(0, 36) : "データ取得済み（更新時刻なし）");
-    }
-    function fetchMonitor() {
-      var req = new XMLHttpRequest();
-      req.open("GET", "./monitor.json?t=" + new Date().getTime(), true);
-      req.onreadystatechange = function () {
-        if (req.readyState !== 4) { return; }
-        if (req.status >= 200 && req.status < 300) {
-          try { renderMonitor(JSON.parse(req.responseText)); return; } catch (e) {}
-        }
-        set("monitorUpdated", "表示用データ未接続 / 更新できません");
-      };
-      req.onerror = function () { set("monitorUpdated", "通信エラー（表示用データ）"); };
-      req.send();
-    }
-    function bind() {
-      el("pagePrev").addEventListener("click", function () { showPage(pageIndex - 1); }, false);
-      el("pageNext").addEventListener("click", function () { showPage(pageIndex + 1); }, false);
-      el("monthPrev").addEventListener("click", function () { if (monthOffset > -24) { monthOffset--; drawCalendar(); } }, false);
-      el("monthNext").addEventListener("click", function () { if (monthOffset < 24) { monthOffset++; drawCalendar(); } }, false);
-      var area = el("pageArea");
-      area.addEventListener("touchstart", function (e) {
-        if (!e.touches || e.touches.length !== 1) { return; }
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-      }, false);
-      area.addEventListener("touchend", function (e) {
-        if (!e.changedTouches || e.changedTouches.length !== 1) { return; }
-        var dx = e.changedTouches[0].clientX - touchStartX;
-        var dy = e.changedTouches[0].clientY - touchStartY;
-        if (Math.abs(dx) > 36 && Math.abs(dx) > Math.abs(dy) * 1.35) {
-          showPage(pageIndex + (dx < 0 ? 1 : -1));
-        }
-      }, false);
-      document.addEventListener("visibilitychange", function () {
-        if (!document.hidden) { tick(); fetchMonitor(); }
-      }, false);
-    }
-    bind();
-    tick();
-    fetchWeather();
-    fetchMonitor();
-    setInterval(tick, 1000);
-    setInterval(fetchWeather, 15 * 60 * 1000);
-    setInterval(fetchMonitor, 5 * 60 * 1000);
-  }());
-  </script>
+    }).catch(function(){ /* keep last values */ });
+  }
+
+  /* ---------- monitor.json ---------- */
+  function fmtDateTime(iso){
+    if (!iso) return "—";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "—";
+    return (d.getMonth()+1) + "/" + d.getDate() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+  function barClass(pct){ return pct <= 15 ? "bar bad" : (pct <= 35 ? "bar warn" : "bar"); }
+  function qrow(name, pct, valText){
+    var right = (valText !== null && valText !== undefined) ? valText
+              : (pct !== null && pct !== undefined) ? pct + "%"
+              : '<span class="na">未取得</span>';
+    var bar = (pct !== null && pct !== undefined)
+      ? '<div class="' + barClass(pct) + '"><i style="width:' + pct + '%"></i></div>'
+      : '<div class="bar"><i style="width:0%"></i></div>';
+    return '<div class="qrow"><span class="name">' + name + '</span>' + bar +
+           '<span class="val">' + right + '</span></div>';
+  }
+  function usd(v){ return (v === null || v === undefined) ? null : "$" + Number(v).toFixed(2); }
+
+  function renderMonitor(j){
+    if (!j) return;
+    $("updated").textContent = fmtDateTime(j.updated_at);
+
+    var mu = j.muse || {};
+    if (mu.weekly_remaining_pct !== null && mu.weekly_remaining_pct !== undefined){
+      $("claude-pct").textContent = mu.weekly_remaining_pct + "%";
+      var b = $("claude-bar"); b.className = barClass(mu.weekly_remaining_pct);
+      b.firstChild.style.width = mu.weekly_remaining_pct + "%";
+    } else { $("claude-pct").innerHTML = '<span class="na">未取得</span>'; }
+    if (mu.plan) $("claude-plan").textContent = mu.plan;
+    $("claude-reset").textContent = fmtDateTime(mu.weekly_reset_at);
+    $("claude-pool").textContent = mu.extra_pool_left || "—";
+
+    var rows = "";
+    var cx = j.codex || {};
+    rows += qrow("Codex 5時間", cx.five_hour_remaining_pct);
+    rows += qrow("Codex 週間", cx.weekly_remaining_pct);
+    var oa = j.openai || {};
+    rows += qrow("OpenAI API", null, usd(oa.credit_remaining_usd));
+    var gm = j.gemini || {};
+    rows += qrow("Gemini", gm.remaining_pct);
+    var md = j.modal || {};
+    rows += qrow("Modal", null, usd(md.credit_remaining_usd));
+    $("quotas").innerHTML = rows;
+
+    var sv = (j.services || {}).coneco || {};
+    var dot = $("dev-dot");
+    dot.className = "dot " + (sv.status === "ok" ? "ok" : sv.status === "warn" ? "warn" : sv.status === "error" ? "error" : "");
+    $("devdetail").textContent = sv.detail || "未接続";
+    var lines = sv.lines || [];
+    var html = "";
+    for (var i=0;i<lines.length;i++) html += "<div>" + lines[i] + "</div>";
+    $("devlines").innerHTML = html;
+    $("dev-updated").textContent = fmtDateTime(j.updated_at) + " 時点";
+  }
+
+  function fetchMonitor(){
+    fetch("monitor.json?t=" + Date.now()).then(function(r){
+      if (!r.ok) throw new Error("not ok");
+      return r.json();
+    }).then(renderMonitor).catch(function(){ /* 未接続表示のまま */ });
+  }
+
+  /* ---------- burn-in countermeasures ---------- */
+  var SHIFTS = [[0,0],[3,2],[-3,2],[2,-3],[-2,-3],[0,3],[3,-2],[-3,-2]];
+  var shiftIdx = 0;
+  function pixelShift(){
+    shiftIdx = (shiftIdx + 1) % SHIFTS.length;
+    var s = SHIFTS[shiftIdx];
+    $("shift").style.transform = "translate(" + s[0] + "px," + s[1] + "px)";
+  }
+
+  /* ---------- start ---------- */
+  tickClock(); buildCal(); fetchWeather(); fetchMonitor();
+  setInterval(tickClock, 1000);
+  setInterval(buildCal, 60000);
+  setInterval(fetchWeather, 15 * 60 * 1000);
+  setInterval(fetchMonitor, 5 * 60 * 1000);
+  setInterval(pixelShift, 60 * 1000);
+})();
+</script>
 </body>
 </html>
