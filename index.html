@@ -78,7 +78,7 @@
   .kv b { color:#fff; font-weight:600; font-variant-numeric:tabular-nums; }
   .na { color:#6f8b96; }
 
-  .qrow { display:flex; align-items:center; gap:.8vw; padding:.5vh 0; font-size:2.3vh; }
+  #refresh-btn { display:block; width:100%; min-height:6vh; margin-top:1.8vh; padding:1.2vh 2vw; font-size:2.6vh; font-weight:700; color:#e8f4f8; background:rgba(65,217,238,.16); border:1px solid rgba(65,217,238,.45); border-radius:1.4vh; cursor:pointer; } #refresh-btn:disabled { opacity:.55; cursor:wait; } #refresh-status { min-height:2.6vh; margin-top:.8vh; font-size:2vh; color:#f0a3a3; text-align:center; } .qrow { display:flex; align-items:center; gap:.8vw; padding:.5vh 0; font-size:2.3vh; }
   .qrow .name { flex:0 0 34%; color:#cfeef7; }
   .qrow .bar { flex:1; margin:0; }
   .qrow .val { flex:0 0 18%; text-align:right; color:#fff; font-variant-numeric:tabular-nums; }
@@ -139,7 +139,7 @@
 
       <div class="panel" id="quota-panel">
         <h2>AI利用枠 <span class="sub">Codex / API / Gemini / Modal</span></h2>
-        <div id="quotas"></div>
+        <div id="quotas"></div><button id="refresh-btn" type="button">最新に更新</button><div id="refresh-status" role="status" aria-live="polite"></div>
       </div>
     </div>
 
@@ -234,7 +234,7 @@
 
   function renderMonitor(j){
     if (!j) return;
-    $("updated").textContent = fmtDateTime(j.updated_at);
+    $("updated").textContent = fmtDateTime((lastUpdatedAt = j.updated_at || lastUpdatedAt));
 
     var mu = j.muse || {};
     if (mu.weekly_remaining_pct !== null && mu.weekly_remaining_pct !== undefined){
@@ -266,10 +266,10 @@
     var html = "";
     for (var i=0;i<lines.length;i++) html += "<div>" + lines[i] + "</div>";
     $("devlines").innerHTML = html;
-    $("dev-updated").textContent = fmtDateTime(j.updated_at) + " 時点";
+    $("dev-updated").textContent = fmtDateTime((lastUpdatedAt = j.updated_at || lastUpdatedAt)) + " 時点";
   }
 
-  var MONITOR_URL = "https://pocketdesk-monitor.hasse430.workers.dev/monitor.json";
+  var MONITOR_URL = "https://pocketdesk-monitor.hasse430.workers.dev/monitor.json"; var REFRESH_URL = "https://pocketdesk-monitor.hasse430.workers.dev/refresh"; var lastUpdatedAt = null; var refreshing = false; var REFRESH_TIMEOUT_MS = 90000; var REFRESH_POLL_MS = 5000;
   function fetchMonitor(){
     fetch(MONITOR_URL + "?t=" + Date.now()).then(function(r){
       if (!r.ok) throw new Error("not ok");
@@ -291,7 +291,7 @@
     $("shift").style.transform = "translate(" + s[0] + "px," + s[1] + "px)";
   }
 
-  /* ---------- start ---------- */
+  /* ---------- start ---------- */ function isNewerUpdatedAt(v, before) { if(!v) return false; if(!before) return true; var a = Date.parse(v), b = Date.parse(before); if(!isNaN(a) && !isNaN(b)) return a > b; return v > before; } function requestRefresh() { if(refreshing) return; var btn = $("refresh-btn"), status = $("refresh-status"); if(!btn) return; refreshing = true; btn.disabled = true; btn.textContent = "更新中…"; if(status) status.textContent = ""; var before = lastUpdatedAt, startedAt = Date.now(); function finish(ok) { if(!ok && status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; } function poll() { fetchMonitor(); setTimeout(function() { if(isNewerUpdatedAt(lastUpdatedAt, before)) { finish(true); return; } if(Date.now() - startedAt >= REFRESH_TIMEOUT_MS) { finish(false); return; } poll(); }, REFRESH_POLL_MS); } fetch(REFRESH_URL, {method: "POST"}).then(function(r) { if(!r.ok) throw new Error("refresh failed"); poll(); }).catch(function() { if(status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; }); } $("refresh-btn").addEventListener("click", requestRefresh);
   tickClock(); buildCal(); fetchWeather(); fetchMonitor();
   setInterval(tickClock, 1000);
   setInterval(buildCal, 60000);
