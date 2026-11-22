@@ -81,9 +81,9 @@
 
   /* calendar */
   #cal { flex:1; }
-  #cal table { width:100%; border-collapse:collapse; font-size:2.45vh; text-align:center; }
-  #cal th { color:#5ee7fa; font-weight:600; padding:.3vh 0; }
-  #cal td { color:#e6f8ff; padding:.34vh 0; font-variant-numeric:tabular-nums; }
+  #cal table { width:100%; border-collapse:collapse; font-size:3vh; text-align:center; }
+  #cal th { color:#5ee7fa; font-weight:600; padding:.8vh 0; }
+  #cal td { color:#e6f8ff; padding:.85vh 0; font-variant-numeric:tabular-nums; }
   #cal td.today { background:rgba(65,217,238,.34); border-radius:50%; color:#fff; font-weight:700; }
   #cal td.dim { color:#55707b; }
   #cal td.sun { color:#ffb3b3; } #cal td.sat { color:#b3d4f0; }
@@ -119,7 +119,6 @@
         <div class="bigpct"><span class="num" id="claude-pct">--%</span><span class="lbl">週間枠の残り</span></div>
         <div class="bar" id="claude-bar"><i style="width:0%"></i></div>
         <div class="kv"><span>リセット</span><b id="claude-reset">—</b></div>
-        <div class="kv"><span>追加トークンプール</span><b id="claude-pool">—</b></div>
       </div>
 
       <div class="panel" id="quota-panel">
@@ -134,11 +133,6 @@
     </div>
 
     <div id="right">
-      <div class="panel" id="dev-panel">
-        <h2><span class="dot" id="dev-dot"></span>Coneco 開発状況 <span class="sub" id="dev-updated"></span></h2>
-        <div id="devdetail">未接続</div>
-        <div id="devlines"></div>
-      </div>
       <div class="panel" id="cal">
         <h2 id="cal-title">カレンダー</h2>
         <div id="cal-body"></div>
@@ -233,7 +227,6 @@
     } else { $("claude-pct").innerHTML = '<span class="na">未取得</span>'; }
     if (mu.plan) $("claude-plan").textContent = mu.plan;
     $("claude-reset").textContent = fmtDateTime(mu.weekly_reset_at);
-    $("claude-pool").textContent = mu.extra_pool_left || "—";
 
     var go = j.opencode_go || {};
     if (go.weekly_used_pct !== null && go.weekly_used_pct !== undefined){
@@ -246,16 +239,6 @@
     $("go-reset").textContent = fmtDateTime(go.weekly_resets_at);
     $("go-monthly").textContent = (go.monthly_used_pct !== null && go.monthly_used_pct !== undefined) ? go.monthly_used_pct + "%" : "—";
     $("go-rolling").textContent = (go.rolling_used_pct !== null && go.rolling_used_pct !== undefined) ? go.rolling_used_pct + "%" : "—";
-
-    var sv = (j.services || {}).coneco || {};
-    var dot = $("dev-dot");
-    dot.className = "dot " + (sv.status === "ok" ? "ok" : sv.status === "warn" ? "warn" : sv.status === "error" ? "error" : "");
-    $("devdetail").textContent = sv.detail || "未接続";
-    var lines = sv.lines || [];
-    var html = "";
-    for (var i=0;i<lines.length;i++) html += "<div>" + lines[i] + "</div>";
-    $("devlines").innerHTML = html;
-    $("dev-updated").textContent = fmtDateTime((lastUpdatedAt = j.updated_at || lastUpdatedAt)) + " 時点";
   }
 
   var MONITOR_URL = "https://pocketdesk-monitor.hasse430.workers.dev/monitor.json"; var REFRESH_URL = "https://pocketdesk-monitor.hasse430.workers.dev/refresh"; var lastUpdatedAt = null; var refreshing = false; var REFRESH_TIMEOUT_MS = 90000; var REFRESH_POLL_MS = 5000;
