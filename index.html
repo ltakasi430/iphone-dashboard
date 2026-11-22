@@ -88,16 +88,15 @@
   #devdetail { font-size:2.3vh; color:#c4ecf7; margin-bottom:.6vh; }
 
   /* calendar */
-  #cal { flex:1; display:flex; flex-direction:column; }
-  #cal-body { flex:1; }
-  #cal table { width:100%; height:100%; border-collapse:collapse; font-size:3.6vh; text-align:center; }
-  #cal th { color:#5ee7fa; font-weight:600; padding:1vh 0; vertical-align:middle; }
-  #cal td { color:#e6f8ff; padding:.4vh 0; font-variant-numeric:tabular-nums; vertical-align:middle; }
-  #cal td.today { background:rgba(65,217,238,.34); border-radius:50%; color:#fff; font-weight:700; }
+  #cal { flex:1; }
+  #cal table { width:100%; border-collapse:collapse; font-size:3.3vh; text-align:center; }
+  #cal th { color:#5ee7fa; font-weight:600; padding:.9vh 0; }
+  #cal td { color:#e6f8ff; padding:1.05vh 0; font-variant-numeric:tabular-nums; vertical-align:top; }
+  #cal .dnum { display:inline-flex; align-items:center; justify-content:center; min-width:5.6vh; height:5.6vh; border-radius:50%; }
+  #cal td.today .dnum { background:rgba(65,217,238,.34); color:#fff; font-weight:700; }
   #cal td.dim { color:#55707b; }
   #cal td.sun { color:#ffb3b3; } #cal td.sat { color:#b3d4f0; }
   #cal td.hol .dnum { color:#ff8f9e; }
-  #cal td.today .dnum { color:#fff; }
   #cal .hname { font-size:1.5vh; line-height:1.15; color:#ff9db0; margin-top:.2vh; }
 
   #footer {
@@ -230,7 +229,7 @@
       var hname = HOLIDAYS[y + "-" + pad(mo+1) + "-" + pad(d)] || "";
       var cls = (d===today) ? "today" : (dow===0 ? "sun" : (dow===6 ? "sat" : ""));
       if (hname) cls = (cls ? cls + " " : "") + "hol";
-      var inner = hname ? '<div class="dnum">' + d + '</div><div class="hname">' + hname + "</div>" : "" + d;
+      var inner = '<span class="dnum">' + d + "</span>" + (hname ? '<div class="hname">' + hname + "</div>" : "");
       html += '<td class="' + cls + '">' + inner + "</td>"; cell++;
       if (cell % 7 === 0 && d < days) html += "</tr><tr>";
     }
