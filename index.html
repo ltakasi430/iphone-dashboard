@@ -29,7 +29,15 @@
   #right { flex:1; display:flex; flex-direction:column; gap:1.5vh; min-width:0; }
 
   /* clock */
-  #clockbox { padding:0.4vh 0.4vw; }
+  #clockbox { padding:0.4vh 0.4vw; display:flex; align-items:flex-start; gap:1.6vw; }
+  #clockmain { flex:1; min-width:0; }
+  #analog { width:23.5vh; height:23.5vh; flex:none; margin-top:.6vh; }
+  #analog .aface { fill:#0a1826; stroke:rgba(65,217,238,.55); stroke-width:1.6; }
+  #analog .ahand { stroke-linecap:round; }
+  #analog .hh { stroke:#eefaff; stroke-width:4.4; }
+  #analog .mh { stroke:#bfefff; stroke-width:3; }
+  #analog .sh { stroke:#22d3ee; stroke-width:1.6; }
+  #analog .acenter { fill:#22d3ee; }
   #clock {
     font-size:18vh; line-height:1; font-weight:200; letter-spacing:.01em;
     color:#ffffff; text-shadow:0 2px 18px rgba(0,229,255,.25);
@@ -80,10 +88,11 @@
   #devdetail { font-size:2.3vh; color:#c4ecf7; margin-bottom:.6vh; }
 
   /* calendar */
-  #cal { flex:1; }
-  #cal table { width:100%; border-collapse:collapse; font-size:3vh; text-align:center; }
-  #cal th { color:#5ee7fa; font-weight:600; padding:.8vh 0; }
-  #cal td { color:#e6f8ff; padding:.85vh 0; font-variant-numeric:tabular-nums; }
+  #cal { flex:1; display:flex; flex-direction:column; }
+  #cal-body { flex:1; }
+  #cal table { width:100%; height:100%; border-collapse:collapse; font-size:3.6vh; text-align:center; }
+  #cal th { color:#5ee7fa; font-weight:600; padding:1vh 0; vertical-align:middle; }
+  #cal td { color:#e6f8ff; padding:.4vh 0; font-variant-numeric:tabular-nums; vertical-align:middle; }
   #cal td.today { background:rgba(65,217,238,.34); border-radius:50%; color:#fff; font-weight:700; }
   #cal td.dim { color:#55707b; }
   #cal td.sun { color:#ffb3b3; } #cal td.sat { color:#b3d4f0; }
@@ -109,9 +118,19 @@
   <div id="layout">
     <div id="left">
       <div id="clockbox">
-        <div id="clock">--<span class="colon" id="colon">:</span>--</div>
-        <div id="dateline"><span id="date">----/--/--</span><span class="dow" id="dow"></span></div>
-        <div id="weather">京都 <span class="temp" id="wtemp">--°</span> <span id="wdesc">取得中…</span></div>
+        <div id="clockmain">
+          <div id="clock">--<span class="colon" id="colon">:</span>--</div>
+          <div id="dateline"><span id="date">----/--/--</span><span class="dow" id="dow"></span></div>
+          <div id="weather">京都 <span class="temp" id="wtemp">--°</span> <span id="wdesc">取得中…</span></div>
+        </div>
+        <svg id="analog" viewBox="0 0 100 100" aria-hidden="true">
+          <circle class="aface" cx="50" cy="50" r="47"></circle>
+          <g id="aticks"></g>
+          <line id="ahour" class="ahand hh" x1="50" y1="50" x2="50" y2="31"></line>
+          <line id="amin" class="ahand mh" x1="50" y1="50" x2="50" y2="21"></line>
+          <line id="asec" class="ahand sh" x1="50" y1="57" x2="50" y2="13"></line>
+          <circle class="acenter" cx="50" cy="50" r="2.6"></circle>
+        </svg>
       </div>
 
       <div class="panel" id="claude-panel">
@@ -162,6 +181,28 @@
     $("date").textContent = now.getFullYear() + "/" + pad(now.getMonth()+1) + "/" + pad(now.getDate());
     $("dow").textContent = "(" + DOW[now.getDay()] + ")";
     document.body.className = (h >= 23 || h < 6) ? "night" : "";
+  }
+
+  /* ---------- analog clock (smooth second hand) ---------- */
+  (function buildTicks(){
+    var html = "";
+    for (var i=0;i<12;i++){
+      var a = i * 30 * Math.PI / 180, big = (i % 3 === 0);
+      var r1 = big ? 40 : 43, r2 = 45.5;
+      html += '<line x1="' + (50 + r1 * Math.sin(a)).toFixed(1) + '" y1="' + (50 - r1 * Math.cos(a)).toFixed(1) +
+              '" x2="' + (50 + r2 * Math.sin(a)).toFixed(1) + '" y2="' + (50 - r2 * Math.cos(a)).toFixed(1) +
+              '" stroke="' + (big ? "#5ee7fa" : "rgba(148,197,214,.5)") + '" stroke-width="' + (big ? 2 : 1.1) + '"/>';
+    }
+    $("aticks").innerHTML = html;
+  })();
+  function updateAnalog(){
+    var now = new Date();
+    var s = now.getSeconds() + now.getMilliseconds() / 1000;
+    var m = now.getMinutes() + s / 60;
+    var h = (now.getHours() % 12) + m / 60;
+    $("asec").setAttribute("transform", "rotate(" + (s * 6).toFixed(2) + " 50 50)");
+    $("amin").setAttribute("transform", "rotate(" + (m * 6).toFixed(2) + " 50 50)");
+    $("ahour").setAttribute("transform", "rotate(" + (h * 30).toFixed(2) + " 50 50)");
   }
 
   /* ---------- calendar ---------- */
@@ -264,8 +305,9 @@
   }
 
   /* ---------- start ---------- */ function isNewerUpdatedAt(v, before) { if(!v) return false; if(!before) return true; var a = Date.parse(v), b = Date.parse(before); if(!isNaN(a) && !isNaN(b)) return a > b; return v > before; } function requestRefresh() { if(refreshing) return; var btn = $("refresh-btn"), status = $("refresh-status"); if(!btn) return; refreshing = true; btn.disabled = true; btn.textContent = "更新中…"; if(status) status.textContent = ""; var before = lastUpdatedAt, startedAt = Date.now(); function finish(ok) { if(!ok && status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; } function poll() { fetchMonitor(); setTimeout(function() { if(isNewerUpdatedAt(lastUpdatedAt, before)) { finish(true); return; } if(Date.now() - startedAt >= REFRESH_TIMEOUT_MS) { finish(false); return; } poll(); }, REFRESH_POLL_MS); } fetch(REFRESH_URL, {method: "POST"}).then(function(r) { if(!r.ok) throw new Error("refresh failed"); poll(); }).catch(function() { if(status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; }); } $("refresh-btn").addEventListener("click", requestRefresh);
-  tickClock(); buildCal(); fetchWeather(); fetchMonitor();
+  tickClock(); updateAnalog(); buildCal(); fetchWeather(); fetchMonitor();
   setInterval(tickClock, 1000);
+  setInterval(updateAnalog, 100);
   setInterval(buildCal, 60000);
   setInterval(fetchWeather, 15 * 60 * 1000);
   setInterval(fetchMonitor, 5 * 60 * 1000);
