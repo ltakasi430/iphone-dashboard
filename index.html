@@ -123,8 +123,13 @@
       </div>
 
       <div class="panel" id="quota-panel">
-        <h2>AI利用枠 <span class="sub">Codex / API / Gemini / Modal</span></h2>
-        <div id="quotas"></div><button id="refresh-btn" type="button">最新に更新</button><div id="refresh-status" role="status" aria-live="polite"></div>
+        <h2>OpenCode Go <span class="sub" id="go-status">週間プール</span></h2>
+        <div class="bigpct"><span class="num" id="go-pct">--%</span><span class="lbl">週間プールの残り</span></div>
+        <div class="bar" id="go-bar"><i style="width:0%"></i></div>
+        <div class="kv"><span>リセット</span><b id="go-reset">—</b></div>
+        <div class="kv"><span>月間の使用率</span><b id="go-monthly">—</b></div>
+        <div class="kv"><span>直近の使用率</span><b id="go-rolling">—</b></div>
+        <button id="refresh-btn" type="button">最新に更新</button><div id="refresh-status" role="status" aria-live="polite"></div>
       </div>
     </div>
 
@@ -230,17 +235,17 @@
     $("claude-reset").textContent = fmtDateTime(mu.weekly_reset_at);
     $("claude-pool").textContent = mu.extra_pool_left || "—";
 
-    var rows = "";
-    var cx = j.codex || {};
-    rows += qrow("Codex 5時間", cx.five_hour_remaining_pct);
-    rows += qrow("Codex 週間", cx.weekly_remaining_pct);
-    var oa = j.openai || {};
-    rows += qrow("OpenAI API", null, usd(oa.credit_remaining_usd));
-    var gm = j.gemini || {};
-    rows += qrow("Gemini", gm.remaining_pct);
-    var md = j.modal || {};
-    rows += qrow("Modal", null, usd(md.credit_remaining_usd));
-    $("quotas").innerHTML = rows;
+    var go = j.opencode_go || {};
+    if (go.weekly_used_pct !== null && go.weekly_used_pct !== undefined){
+      var remain = 100 - go.weekly_used_pct;
+      $("go-pct").textContent = remain + "%";
+      var gb = $("go-bar"); gb.className = barClass(remain);
+      gb.firstChild.style.width = remain + "%";
+    } else { $("go-pct").innerHTML = '<span class="na">未取得</span>'; }
+    $("go-status").textContent = go.weekly_status === "rate-limited" ? "週間プール（上限到達）" : "週間プール";
+    $("go-reset").textContent = fmtDateTime(go.weekly_resets_at);
+    $("go-monthly").textContent = (go.monthly_used_pct !== null && go.monthly_used_pct !== undefined) ? go.monthly_used_pct + "%" : "—";
+    $("go-rolling").textContent = (go.rolling_used_pct !== null && go.rolling_used_pct !== undefined) ? go.rolling_used_pct + "%" : "—";
 
     var sv = (j.services || {}).coneco || {};
     var dot = $("dev-dot");
