@@ -9,27 +9,16 @@
   html, body { height:100%; }
   body {
     font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-    background:#04070d;
-    color:#e8f4f8;
+    background:#050b12;
+    color:#eefaff;
     overflow:hidden;
     -webkit-user-select:none; user-select:none;
-  }
-  #bg {
-    position:fixed; inset:0;
-    background:url('iris-wallpaper-galaxy.jpg') no-repeat right center;
-    background-size:cover;
-    z-index:0;
-  }
-  #bgshade {
-    position:fixed; inset:0; z-index:1;
-    background:linear-gradient(90deg, rgba(3,8,16,.88) 0%, rgba(3,8,16,.72) 46%, rgba(3,8,16,.18) 78%, rgba(3,8,16,.05) 100%);
   }
   #nightdim {
     position:fixed; inset:0; z-index:3; background:#000; opacity:0;
     pointer-events:none; transition:opacity 2s;
   }
   body.night #nightdim { opacity:.38; }
-  body.night #bg { filter:brightness(.75); }
 
   #shift { position:relative; z-index:2; height:100%; transition:transform 1.2s ease; }
   #layout {
@@ -42,70 +31,70 @@
   /* clock */
   #clockbox { padding:0.4vh 0.4vw; }
   #clock {
-    font-size:19vh; line-height:1; font-weight:200; letter-spacing:.01em;
-    color:#f4fbff; text-shadow:0 2px 18px rgba(0,229,255,.25);
+    font-size:20vh; line-height:1; font-weight:200; letter-spacing:.01em;
+    color:#ffffff; text-shadow:0 2px 18px rgba(0,229,255,.25);
     font-variant-numeric:tabular-nums; white-space:nowrap;
   }
   #clock .colon { display:inline-block; }
   #clock .colon.off { opacity:.15; }
-  #dateline { margin-top:0.8vh; font-size:3.4vh; color:#bfe9f5; }
+  #dateline { margin-top:0.8vh; font-size:3.9vh; color:#d8f6ff; }
   #dateline .dow { color:#41d9ee; margin-left:.5em; }
-  #weather { margin-top:0.4vh; font-size:3vh; color:#9fd8e8; }
-  #weather .temp { color:#fff; font-size:3.6vh; }
+  #weather { margin-top:0.4vh; font-size:3.5vh; color:#c4ecf7; }
+  #weather .temp { color:#fff; font-size:4.1vh; }
 
   /* panels */
   .panel {
-    background:rgba(6,18,30,.62);
-    border:1px solid rgba(65,217,238,.28);
+    background:#0a1826;
+    border:1px solid rgba(65,217,238,.5);
     border-radius:1.4vh;
-    padding:1.5vh 1.2vw;
-    backdrop-filter: blur(2px);
+    padding:1.7vh 1.3vw;
   }
   .panel h2 {
-    font-size:2.5vh; font-weight:600; color:#41d9ee; letter-spacing:.12em;
-    margin-bottom:1vh; display:flex; align-items:center; gap:.6em;
+    font-size:2.9vh; font-weight:600; color:#5ee7fa; letter-spacing:.12em;
+    margin-bottom:1.1vh; display:flex; align-items:center; gap:.6em;
   }
-  .panel h2 .sub { margin-left:auto; font-size:2vh; color:#8fb8c4; letter-spacing:0; font-weight:400; }
+  .panel h2 .sub { margin-left:auto; font-size:2.3vh; color:#a9cfdb; letter-spacing:0; font-weight:400; }
 
   .bigpct { display:flex; align-items:baseline; gap:1vw; }
-  .bigpct .num { font-size:7.2vh; font-weight:200; color:#fff; line-height:1; }
-  .bigpct .lbl { font-size:2.4vh; color:#bfe9f5; }
-  .bar { height:1.1vh; border-radius:.6vh; background:rgba(255,255,255,.12); margin:1vh 0 .6vh; overflow:hidden; }
-  .bar > i { display:block; height:100%; background:linear-gradient(90deg,#1899b2,#41d9ee); border-radius:.6vh; }
+  .bigpct .num { font-size:8.4vh; font-weight:200; color:#fff; line-height:1; }
+  .bigpct .lbl { font-size:2.8vh; color:#d8f6ff; }
+  .bar { height:1.3vh; border-radius:.65vh; background:rgba(255,255,255,.16); margin:1.1vh 0 .7vh; overflow:hidden; }
+  .bar > i { display:block; height:100%; background:linear-gradient(90deg,#1899b2,#41d9ee); border-radius:.65vh; }
   .bar.warn > i { background:linear-gradient(90deg,#b26a18,#eeb041); }
   .bar.bad > i { background:linear-gradient(90deg,#b21818,#ee4141); }
-  .kv { display:flex; justify-content:space-between; font-size:2.3vh; color:#cfeef7; padding:.35vh 0; }
+  .kv { display:flex; justify-content:space-between; font-size:2.7vh; color:#e2f7ff; padding:.4vh 0; }
   .kv b { color:#fff; font-weight:600; font-variant-numeric:tabular-nums; }
-  .na { color:#6f8b96; }
+  .na { color:#93aeba; }
 
-  #refresh-btn { display:block; width:100%; min-height:6vh; margin-top:1.8vh; padding:1.2vh 2vw; font-size:2.6vh; font-weight:700; color:#e8f4f8; background:rgba(65,217,238,.16); border:1px solid rgba(65,217,238,.45); border-radius:1.4vh; cursor:pointer; } #refresh-btn:disabled { opacity:.55; cursor:wait; } #refresh-status { min-height:2.6vh; margin-top:.8vh; font-size:2vh; color:#f0a3a3; text-align:center; } .qrow { display:flex; align-items:center; gap:.8vw; padding:.5vh 0; font-size:2.3vh; }
-  .qrow .name { flex:0 0 34%; color:#cfeef7; }
+  .qrow { display:flex; align-items:center; gap:.8vw; padding:.55vh 0; font-size:2.7vh; }
+  .qrow .name { flex:0 0 34%; color:#e2f7ff; }
   .qrow .bar { flex:1; margin:0; }
   .qrow .val { flex:0 0 18%; text-align:right; color:#fff; font-variant-numeric:tabular-nums; }
 
-  .dot { display:inline-block; width:1.4vh; height:1.4vh; border-radius:50%; background:#5a6d75; vertical-align:middle; }
+  .dot { display:inline-block; width:1.6vh; height:1.6vh; border-radius:50%; background:#5a6d75; vertical-align:middle; }
   .dot.ok { background:#39e08c; box-shadow:0 0 8px rgba(57,224,140,.8); }
   .dot.warn { background:#eeb041; box-shadow:0 0 8px rgba(238,176,65,.8); }
   .dot.error { background:#ee4141; box-shadow:0 0 8px rgba(238,65,65,.8); }
-  #devlines { font-size:2.35vh; line-height:1.5; color:#e6f6fb; }
+  #devlines { font-size:2.7vh; line-height:1.55; color:#f0fbff; }
   #devlines div { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  #devdetail { font-size:2.1vh; color:#9fd8e8; margin-bottom:.6vh; }
+  #devdetail { font-size:2.5vh; color:#c4ecf7; margin-bottom:.7vh; }
+
+  #quota-panel { flex:1; }
 
   /* calendar */
-  #cal table { width:100%; border-collapse:collapse; font-size:2.2vh; text-align:center; }
-  #cal th { color:#41d9ee; font-weight:600; padding:.3vh 0; }
-  #cal td { color:#d7edf4; padding:.32vh 0; font-variant-numeric:tabular-nums; }
-  #cal td.today { background:rgba(65,217,238,.28); border-radius:50%; color:#fff; font-weight:700; }
+  #cal { flex:1; }
+  #cal table { width:100%; border-collapse:collapse; font-size:2.6vh; text-align:center; }
+  #cal th { color:#5ee7fa; font-weight:600; padding:.35vh 0; }
+  #cal td { color:#e6f8ff; padding:.38vh 0; font-variant-numeric:tabular-nums; }
+  #cal td.today { background:rgba(65,217,238,.34); border-radius:50%; color:#fff; font-weight:700; }
   #cal td.dim { color:#55707b; }
-  #cal td.sun { color:#f0a3a3; } #cal td.sat { color:#a3c8f0; }
+  #cal td.sun { color:#ffb3b3; } #cal td.sat { color:#b3d4f0; }
 
   #footer {
     margin-top:auto; display:flex; justify-content:space-between; align-items:baseline;
-    font-size:1.9vh; color:#7fa6b3; padding:0 .4vw;
+    font-size:2.1vh; color:#9dc3d1; padding:0 .4vw;
   }
-  #footer a { color:#7fa6b3; text-decoration:none; }
-
-  #spacer-iris { flex:1; min-height:6vh; }
+  #footer a { color:#9dc3d1; text-decoration:none; }
 
   @media (orientation: portrait) {
     #layout { flex-direction:column; overflow-y:auto; }
@@ -116,8 +105,6 @@
 </style>
 </head>
 <body>
-<div id="bg"></div>
-<div id="bgshade"></div>
 <div id="nightdim"></div>
 
 <div id="shift">
@@ -139,12 +126,11 @@
 
       <div class="panel" id="quota-panel">
         <h2>AI利用枠 <span class="sub">Codex / API / Gemini / Modal</span></h2>
-        <div id="quotas"></div><button id="refresh-btn" type="button">最新に更新</button><div id="refresh-status" role="status" aria-live="polite"></div>
+        <div id="quotas"></div>
       </div>
     </div>
 
     <div id="right">
-      <div id="spacer-iris"></div>
       <div class="panel" id="dev-panel">
         <h2><span class="dot" id="dev-dot"></span>Coneco 開発状況 <span class="sub" id="dev-updated"></span></h2>
         <div id="devdetail">未接続</div>
@@ -234,7 +220,7 @@
 
   function renderMonitor(j){
     if (!j) return;
-    $("updated").textContent = fmtDateTime((lastUpdatedAt = j.updated_at || lastUpdatedAt));
+    $("updated").textContent = fmtDateTime(j.updated_at);
 
     var mu = j.muse || {};
     if (mu.weekly_remaining_pct !== null && mu.weekly_remaining_pct !== undefined){
@@ -266,10 +252,10 @@
     var html = "";
     for (var i=0;i<lines.length;i++) html += "<div>" + lines[i] + "</div>";
     $("devlines").innerHTML = html;
-    $("dev-updated").textContent = fmtDateTime((lastUpdatedAt = j.updated_at || lastUpdatedAt)) + " 時点";
+    $("dev-updated").textContent = fmtDateTime(j.updated_at) + " 時点";
   }
 
-  var MONITOR_URL = "https://pocketdesk-monitor.hasse430.workers.dev/monitor.json"; var REFRESH_URL = "https://pocketdesk-monitor.hasse430.workers.dev/refresh"; var lastUpdatedAt = null; var refreshing = false; var REFRESH_TIMEOUT_MS = 90000; var REFRESH_POLL_MS = 5000;
+  var MONITOR_URL = "https://pocketdesk-monitor.hasse430.workers.dev/monitor.json";
   function fetchMonitor(){
     fetch(MONITOR_URL + "?t=" + Date.now()).then(function(r){
       if (!r.ok) throw new Error("not ok");
@@ -291,7 +277,7 @@
     $("shift").style.transform = "translate(" + s[0] + "px," + s[1] + "px)";
   }
 
-  /* ---------- start ---------- */ function isNewerUpdatedAt(v, before) { if(!v) return false; if(!before) return true; var a = Date.parse(v), b = Date.parse(before); if(!isNaN(a) && !isNaN(b)) return a > b; return v > before; } function requestRefresh() { if(refreshing) return; var btn = $("refresh-btn"), status = $("refresh-status"); if(!btn) return; refreshing = true; btn.disabled = true; btn.textContent = "更新中…"; if(status) status.textContent = ""; var before = lastUpdatedAt, startedAt = Date.now(); function finish(ok) { if(!ok && status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; } function poll() { fetchMonitor(); setTimeout(function() { if(isNewerUpdatedAt(lastUpdatedAt, before)) { finish(true); return; } if(Date.now() - startedAt >= REFRESH_TIMEOUT_MS) { finish(false); return; } poll(); }, REFRESH_POLL_MS); } fetch(REFRESH_URL, {method: "POST"}).then(function(r) { if(!r.ok) throw new Error("refresh failed"); poll(); }).catch(function() { if(status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; }); } $("refresh-btn").addEventListener("click", requestRefresh);
+  /* ---------- start ---------- */
   tickClock(); buildCal(); fetchWeather(); fetchMonitor();
   setInterval(tickClock, 1000);
   setInterval(buildCal, 60000);
