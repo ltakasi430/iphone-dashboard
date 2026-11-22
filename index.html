@@ -96,6 +96,9 @@
   #cal td.today { background:rgba(65,217,238,.34); border-radius:50%; color:#fff; font-weight:700; }
   #cal td.dim { color:#55707b; }
   #cal td.sun { color:#ffb3b3; } #cal td.sat { color:#b3d4f0; }
+  #cal td.hol .dnum { color:#ff8f9e; }
+  #cal td.today .dnum { color:#fff; }
+  #cal .hname { font-size:1.5vh; line-height:1.15; color:#ff9db0; margin-top:.2vh; }
 
   #footer {
     margin-top:auto; display:flex; justify-content:space-between; align-items:baseline;
@@ -206,6 +209,14 @@
   }
 
   /* ---------- calendar ---------- */
+  var HOLIDAYS = {};
+  function fetchHolidays(){
+    var y = new Date().getFullYear();
+    fetch("https://holidays-jp.github.io/api/v1/" + y + "/date.json")
+      .then(function(r){ return r.json(); })
+      .then(function(j){ if (j){ HOLIDAYS = j; buildCal(); } })
+      .catch(function(){});
+  }
   function buildCal(){
     var now = new Date(), y = now.getFullYear(), mo = now.getMonth(), today = now.getDate();
     $("cal-title").textContent = y + "年" + (mo+1) + "月";
@@ -216,8 +227,11 @@
     for (i=0;i<first;i++){ html += "<td></td>"; cell++; }
     for (var d=1; d<=days; d++){
       var dow = (first + d - 1) % 7;
+      var hname = HOLIDAYS[y + "-" + pad(mo+1) + "-" + pad(d)] || "";
       var cls = (d===today) ? "today" : (dow===0 ? "sun" : (dow===6 ? "sat" : ""));
-      html += '<td class="' + cls + '">' + d + "</td>"; cell++;
+      if (hname) cls = (cls ? cls + " " : "") + "hol";
+      var inner = hname ? '<div class="dnum">' + d + '</div><div class="hname">' + hname + "</div>" : "" + d;
+      html += '<td class="' + cls + '">' + inner + "</td>"; cell++;
       if (cell % 7 === 0 && d < days) html += "</tr><tr>";
     }
     html += "</tr></table>";
@@ -305,10 +319,11 @@
   }
 
   /* ---------- start ---------- */ function isNewerUpdatedAt(v, before) { if(!v) return false; if(!before) return true; var a = Date.parse(v), b = Date.parse(before); if(!isNaN(a) && !isNaN(b)) return a > b; return v > before; } function requestRefresh() { if(refreshing) return; var btn = $("refresh-btn"), status = $("refresh-status"); if(!btn) return; refreshing = true; btn.disabled = true; btn.textContent = "更新中…"; if(status) status.textContent = ""; var before = lastUpdatedAt, startedAt = Date.now(); function finish(ok) { if(!ok && status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; } function poll() { fetchMonitor(); setTimeout(function() { if(isNewerUpdatedAt(lastUpdatedAt, before)) { finish(true); return; } if(Date.now() - startedAt >= REFRESH_TIMEOUT_MS) { finish(false); return; } poll(); }, REFRESH_POLL_MS); } fetch(REFRESH_URL, {method: "POST"}).then(function(r) { if(!r.ok) throw new Error("refresh failed"); poll(); }).catch(function() { if(status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; }); } $("refresh-btn").addEventListener("click", requestRefresh);
-  tickClock(); updateAnalog(); buildCal(); fetchWeather(); fetchMonitor();
+  tickClock(); updateAnalog(); buildCal(); fetchHolidays(); fetchWeather(); fetchMonitor();
   setInterval(tickClock, 1000);
   setInterval(updateAnalog, 100);
   setInterval(buildCal, 60000);
+  setInterval(fetchHolidays, 24 * 60 * 60 * 1000);
   setInterval(fetchWeather, 15 * 60 * 1000);
   setInterval(fetchMonitor, 5 * 60 * 1000);
   setInterval(pixelShift, 60 * 1000);
