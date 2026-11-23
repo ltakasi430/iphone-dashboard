@@ -97,7 +97,6 @@
   #cal td.dim { color:#55707b; }
   #cal td.sun { color:#ffb3b3; } #cal td.sat { color:#b3d4f0; }
   #cal td.hol .dnum { color:#ff8f9e; }
-  #cal .hname { font-size:1.5vh; line-height:1.15; color:#ff9db0; margin-top:.2vh; }
 
   #footer {
     margin-top:auto; display:flex; justify-content:space-between; align-items:baseline;
@@ -230,7 +229,7 @@
       var hname = HOLIDAYS[y + "-" + pad(mo+1) + "-" + pad(d)] || "";
       var cls = (d===today) ? "today" : (dow===0 ? "sun" : (dow===6 ? "sat" : ""));
       if (hname) cls = (cls ? cls + " " : "") + "hol";
-      var inner = '<span class="dnum">' + d + "</span>" + (hname ? '<div class="hname">' + hname + "</div>" : "");
+      var inner = '<span class="dnum">' + d + "</span>";
       html += '<td class="' + cls + '">' + inner + "</td>"; cell++;
       if (cell % 7 === 0 && d < days) html += "</tr><tr>";
     }
