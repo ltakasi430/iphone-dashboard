@@ -43,7 +43,7 @@
     color:#ffffff; text-shadow:0 2px 18px rgba(0,229,255,.25);
     font-variant-numeric:tabular-nums; white-space:nowrap;
   }
-  #clock .colon { display:inline-block; transform:translateY(.07em); }
+  #clock .colon { display:inline-block; transform:translateY(-.15em); }
   #clock .colon.off { opacity:.15; }
   #dateline { margin-top:0.8vh; font-size:3.5vh; color:#d8f6ff; }
   #dateline .dow { color:#41d9ee; margin-left:.5em; }
@@ -88,7 +88,7 @@
   #devdetail { font-size:2.3vh; color:#c4ecf7; margin-bottom:.6vh; }
 
   /* calendar */
-  #cal { flex:1; }
+  #cal { flex:0 0 auto; }
   #cal table { width:100%; border-collapse:collapse; font-size:3.3vh; text-align:center; }
   #cal th { color:#5ee7fa; font-weight:600; padding:.9vh 0; }
   #cal td { color:#e6f8ff; padding:1.05vh 0; font-variant-numeric:tabular-nums; vertical-align:top; }
@@ -104,6 +104,7 @@
     font-size:2vh; color:#9dc3d1; padding:0 .4vw;
   }
   #footer a { color:#9dc3d1; text-decoration:none; }
+  #footer span { white-space:nowrap; }
 
   @media (orientation: portrait) {
     #layout { flex-direction:column; overflow-y:auto; }
@@ -160,7 +161,7 @@
       </div>
       <div id="footer">
         <span>Pocket Desk – Galaxy Monitor</span>
-        <span>データ更新 <span id="updated">—</span> ／ <a href="iphone.html">iPhone版</a> ・ <a href="classic.html">旧画面</a></span>
+        <span>データ更新 <span id="updated">—</span></span>
       </div>
     </div>
   </div>
