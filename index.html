@@ -99,9 +99,9 @@
   #cal td.sun { color:#ffb3b3; } #cal td.sat { color:#b3d4f0; }
   #cal td.hol .dnum { color:#ff8f9e; }
 
-  /* wallpaper (アプリが端末内フォルダから配信する画像。無い環境では出ない) */
-  #wp { flex:1; min-height:0; border:1px solid rgba(65,217,238,.5); border-radius:1.4vh; overflow:hidden; display:none; }
-  #wp img { width:100%; height:100%; object-fit:cover; display:block; opacity:0; transition:opacity .8s; }
+  /* wallpaper 全面背景 (アプリが Drive / 端末内フォルダから配信する画像。無い環境では出ない) */
+  #bg { position:fixed; inset:0; z-index:0; overflow:hidden; }
+  #bg img { width:100%; height:100%; object-fit:cover; display:block; opacity:0; transition:opacity .8s; filter:brightness(.48); }
 
   #footer {
     margin-top:auto; display:flex; justify-content:space-between; align-items:baseline;
@@ -119,6 +119,7 @@
 </style>
 </head>
 <body>
+<div id="bg"><img id="bg-img" alt=""></div>
 <div id="nightdim"></div>
 
 <div id="shift">
@@ -163,7 +164,7 @@
         <h2 id="cal-title">カレンダー</h2>
         <div id="cal-body"></div>
       </div>
-      <div id="wp"><img id="wp-img" alt=""></div>
+
       <div id="footer">
         <span>Pocket Desk – Galaxy Monitor</span>
         <span>データ更新 <span id="updated">—</span></span>
@@ -341,12 +342,12 @@
   /* ---------- wallpaper (Android アプリが端末内フォルダの画像を配信する) ---------- */
   var WP_BASE = "https://pocketdesk.local/wallpaper/";
   var wpList = [], wpIdx = 0, wpOff = false;
-  function wpApply(){ $("wp-img").style.opacity = wpOff ? "0" : "1"; }
+  function wpApply(){ $("bg-img").style.opacity = wpOff ? "0" : "1"; }
   function wpShow(i){
     if (!wpList.length) return;
     wpIdx = ((i % wpList.length) + wpList.length) % wpList.length;
     var url = WP_BASE + encodeURIComponent(wpList[wpIdx]);
-    var img = $("wp-img");
+    var img = $("bg-img");
     if (img.getAttribute("src") === url){ wpApply(); return; }
     /* 先に読み込んでから差し替える (Drive 取得時は数秒かかるので空白を作らない) */
     var pre = new Image();
@@ -356,15 +357,19 @@
   function initWallpaper(){
     fetch(WP_BASE + "list.json").then(function(r){ if (!r.ok) throw new Error("no wp"); return r.json(); })
     .then(function(list){
-      if (!list || !list.length){ $("wp").style.display = "none"; wpList = []; return; }
+      if (!list || !list.length){ wpList = []; return; }
       var first = !wpList.length;
       wpList = list;
-      $("wp").style.display = "block";
       if (first) wpShow(0);
     }).catch(function(){});
   }
-  $("wp-img").addEventListener("load", wpApply);
-  $("wp").addEventListener("click", function(){ wpOff = !wpOff; wpApply(); });
+  $("bg-img").addEventListener("load", wpApply);
+  /* 背景のタップで表示/非表示 (ボタンやリンクのタップでは切り替えない) */
+  document.addEventListener("click", function(e){
+    if (e.target.closest && e.target.closest("button, a")) return;
+    if (!wpList.length) return;
+    wpOff = !wpOff; wpApply();
+  });
 
   /* ---------- start ---------- */ function isNewerUpdatedAt(v, before) { if(!v) return false; if(!before) return true; var a = Date.parse(v), b = Date.parse(before); if(!isNaN(a) && !isNaN(b)) return a > b; return v > before; } function requestRefresh() { if(refreshing) return; var btn = $("refresh-btn"), status = $("refresh-status"); if(!btn) return; refreshing = true; btn.disabled = true; btn.textContent = "更新中…"; if(status) status.textContent = ""; var before = lastUpdatedAt, startedAt = Date.now(); function finish(ok) { if(!ok && status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; } function poll() { fetchMonitor(); setTimeout(function() { if(isNewerUpdatedAt(lastUpdatedAt, before)) { finish(true); return; } if(Date.now() - startedAt >= REFRESH_TIMEOUT_MS) { finish(false); return; } poll(); }, REFRESH_POLL_MS); } fetch(REFRESH_URL, {method: "POST"}).then(function(r) { if(!r.ok) throw new Error("refresh failed"); poll(); }).catch(function() { if(status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; }); } $("refresh-btn").addEventListener("click", requestRefresh);
   tickClock(); updateAnalog(); buildCal(); fetchHolidays(); fetchWeather(); fetchMonitor(); initWallpaper();
