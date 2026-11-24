@@ -345,9 +345,13 @@
   function wpShow(i){
     if (!wpList.length) return;
     wpIdx = ((i % wpList.length) + wpList.length) % wpList.length;
+    var url = WP_BASE + encodeURIComponent(wpList[wpIdx]);
     var img = $("wp-img");
-    img.style.opacity = "0";
-    img.src = WP_BASE + encodeURIComponent(wpList[wpIdx]);
+    if (img.getAttribute("src") === url){ wpApply(); return; }
+    /* 先に読み込んでから差し替える (Drive 取得時は数秒かかるので空白を作らない) */
+    var pre = new Image();
+    pre.onload = function(){ img.src = url; wpApply(); };
+    pre.src = url;
   }
   function initWallpaper(){
     fetch(WP_BASE + "list.json").then(function(r){ if (!r.ok) throw new Error("no wp"); return r.json(); })
