@@ -99,6 +99,10 @@
   #cal td.sun { color:#ffb3b3; } #cal td.sat { color:#b3d4f0; }
   #cal td.hol .dnum { color:#ff8f9e; }
 
+  /* wallpaper (アプリが端末内フォルダから配信する画像。無い環境では出ない) */
+  #wp { flex:1; min-height:0; border:1px solid rgba(65,217,238,.5); border-radius:1.4vh; overflow:hidden; display:none; }
+  #wp img { width:100%; height:100%; object-fit:cover; display:block; opacity:0; transition:opacity .8s; }
+
   #footer {
     margin-top:auto; display:flex; justify-content:space-between; align-items:baseline;
     font-size:2vh; color:#9dc3d1; padding:0 .4vw;
@@ -159,6 +163,7 @@
         <h2 id="cal-title">カレンダー</h2>
         <div id="cal-body"></div>
       </div>
+      <div id="wp"><img id="wp-img" alt=""></div>
       <div id="footer">
         <span>Pocket Desk – Galaxy Monitor</span>
         <span>データ更新 <span id="updated">—</span></span>
@@ -184,6 +189,11 @@
     $("date").textContent = now.getFullYear() + "/" + pad(now.getMonth()+1) + "/" + pad(now.getDate());
     $("dow").textContent = "(" + DOW[now.getDay()] + ")";
     document.body.className = (h >= 23 || h < 6) ? "night" : "";
+  }
+  /* 秒の境界に合わせて更新する (setInterval の累積ズレで点滅が不規則になるのを防ぐ) */
+  function scheduleClock(){
+    var delay = 1000 - (Date.now() % 1000) + 20;
+    setTimeout(function(){ tickClock(); scheduleClock(); }, delay);
   }
 
   /* ---------- analog clock (smooth second hand) ---------- */
@@ -328,9 +338,35 @@
     $("shift").style.transform = "translate(" + s[0] + "px," + s[1] + "px)";
   }
 
+  /* ---------- wallpaper (Android アプリが端末内フォルダの画像を配信する) ---------- */
+  var WP_BASE = "https://pocketdesk.local/wallpaper/";
+  var wpList = [], wpIdx = 0, wpOff = false;
+  function wpApply(){ $("wp-img").style.opacity = wpOff ? "0" : "1"; }
+  function wpShow(i){
+    if (!wpList.length) return;
+    wpIdx = ((i % wpList.length) + wpList.length) % wpList.length;
+    var img = $("wp-img");
+    img.style.opacity = "0";
+    img.src = WP_BASE + encodeURIComponent(wpList[wpIdx]);
+  }
+  function initWallpaper(){
+    fetch(WP_BASE + "list.json").then(function(r){ if (!r.ok) throw new Error("no wp"); return r.json(); })
+    .then(function(list){
+      if (!list || !list.length){ $("wp").style.display = "none"; wpList = []; return; }
+      var first = !wpList.length;
+      wpList = list;
+      $("wp").style.display = "block";
+      if (first) wpShow(0);
+    }).catch(function(){});
+  }
+  $("wp-img").addEventListener("load", wpApply);
+  $("wp").addEventListener("click", function(){ wpOff = !wpOff; wpApply(); });
+
   /* ---------- start ---------- */ function isNewerUpdatedAt(v, before) { if(!v) return false; if(!before) return true; var a = Date.parse(v), b = Date.parse(before); if(!isNaN(a) && !isNaN(b)) return a > b; return v > before; } function requestRefresh() { if(refreshing) return; var btn = $("refresh-btn"), status = $("refresh-status"); if(!btn) return; refreshing = true; btn.disabled = true; btn.textContent = "更新中…"; if(status) status.textContent = ""; var before = lastUpdatedAt, startedAt = Date.now(); function finish(ok) { if(!ok && status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; } function poll() { fetchMonitor(); setTimeout(function() { if(isNewerUpdatedAt(lastUpdatedAt, before)) { finish(true); return; } if(Date.now() - startedAt >= REFRESH_TIMEOUT_MS) { finish(false); return; } poll(); }, REFRESH_POLL_MS); } fetch(REFRESH_URL, {method: "POST"}).then(function(r) { if(!r.ok) throw new Error("refresh failed"); poll(); }).catch(function() { if(status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; }); } $("refresh-btn").addEventListener("click", requestRefresh);
-  tickClock(); updateAnalog(); buildCal(); fetchHolidays(); fetchWeather(); fetchMonitor();
-  setInterval(tickClock, 1000);
+  tickClock(); updateAnalog(); buildCal(); fetchHolidays(); fetchWeather(); fetchMonitor(); initWallpaper();
+  setInterval(function(){ if (wpList.length > 1) wpShow(wpIdx + 1); }, 5 * 60 * 1000);
+  setInterval(initWallpaper, 60 * 60 * 1000);
+  scheduleClock();
   setInterval(updateAnalog, 100);
   setInterval(buildCal, 60000);
   setInterval(fetchHolidays, 24 * 60 * 60 * 1000);
