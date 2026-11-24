@@ -72,6 +72,7 @@
   .bar.bad > i { background:linear-gradient(90deg,#b21818,#ee4141); }
   .kv { display:flex; justify-content:space-between; font-size:2.45vh; color:#e2f7ff; padding:.35vh 0; }
   .kv b { color:#fff; font-weight:600; font-variant-numeric:tabular-nums; }
+  .kv .pace { color:#a9cfdb; font-size:2.1vh; margin-left:.7em; }
   .na { color:#93aeba; }
 
   #refresh-btn { display:block; width:100%; min-height:5.6vh; margin-top:1.4vh; padding:1vh 2vw; font-size:2.6vh; font-weight:700; color:#eefaff; background:rgba(65,217,238,.22); border:1px solid rgba(65,217,238,.55); border-radius:1.4vh; cursor:pointer; } #refresh-btn:disabled { opacity:.55; cursor:wait; } #refresh-status { min-height:2.4vh; margin-top:.6vh; font-size:2vh; color:#ffb3b3; text-align:center; } .qrow { display:flex; align-items:center; gap:.8vw; padding:.45vh 0; font-size:2.45vh; }
@@ -139,14 +140,14 @@
         <h2>Muse <span class="sub" id="claude-plan">Power</span></h2>
         <div class="bigpct"><span class="num" id="claude-pct">--%</span><span class="lbl">週間枠の残り</span></div>
         <div class="bar" id="claude-bar"><i style="width:0%"></i></div>
-        <div class="kv"><span>リセット</span><b id="claude-reset">—</b></div>
+        <div class="kv"><span>リセット</span><span><b id="claude-reset">—</b><span class="pace" id="claude-pace"></span></span></div>
       </div>
 
       <div class="panel" id="quota-panel">
         <h2>OpenCode Go <span class="sub" id="go-status">週間プール</span></h2>
         <div class="bigpct"><span class="num" id="go-pct">--%</span><span class="lbl">週間プールの残り</span></div>
         <div class="bar" id="go-bar"><i style="width:0%"></i></div>
-        <div class="kv"><span>リセット</span><b id="go-reset">—</b></div>
+        <div class="kv"><span>リセット</span><span><b id="go-reset">—</b><span class="pace" id="go-pace"></span></span></div>
         <div class="kv"><span>月間の使用率</span><b id="go-monthly">—</b></div>
         <div class="kv"><span>直近の使用率</span><b id="go-rolling">—</b></div>
         <button id="refresh-btn" type="button">最新に更新</button><div id="refresh-status" role="status" aria-live="polite"></div>
@@ -257,6 +258,13 @@
     return (d.getMonth()+1) + "/" + d.getDate() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
   }
   function barClass(pct){ return pct <= 15 ? "bar bad" : (pct <= 35 ? "bar warn" : "bar"); }
+  function paceText(remainPct, resetIso){
+    if (remainPct === null || remainPct === undefined || !resetIso) return "";
+    var ms = Date.parse(resetIso) - Date.now();
+    if (isNaN(ms) || ms <= 0) return "";
+    var per = remainPct / (ms / 86400000);
+    return "1日約" + (per >= 10 ? Math.round(per) : per.toFixed(1)) + "%ペース";
+  }
   function qrow(name, pct, valText){
     var right = (valText !== null && valText !== undefined) ? valText
               : (pct !== null && pct !== undefined) ? pct + "%"
@@ -281,6 +289,7 @@
     } else { $("claude-pct").innerHTML = '<span class="na">未取得</span>'; }
     if (mu.plan) $("claude-plan").textContent = mu.plan;
     $("claude-reset").textContent = fmtDateTime(mu.weekly_reset_at);
+    $("claude-pace").textContent = paceText(mu.weekly_remaining_pct, mu.weekly_reset_at);
 
     var go = j.opencode_go || {};
     if (go.weekly_used_pct !== null && go.weekly_used_pct !== undefined){
@@ -291,6 +300,8 @@
     } else { $("go-pct").innerHTML = '<span class="na">未取得</span>'; }
     $("go-status").textContent = go.weekly_status === "rate-limited" ? "週間プール（上限到達）" : "週間プール";
     $("go-reset").textContent = fmtDateTime(go.weekly_resets_at);
+    $("go-pace").textContent = (go.weekly_used_pct !== null && go.weekly_used_pct !== undefined)
+      ? paceText(100 - go.weekly_used_pct, go.weekly_resets_at) : "";
     $("go-monthly").textContent = (go.monthly_used_pct !== null && go.monthly_used_pct !== undefined) ? go.monthly_used_pct + "%" : "—";
     $("go-rolling").textContent = (go.rolling_used_pct !== null && go.rolling_used_pct !== undefined) ? go.rolling_used_pct + "%" : "—";
   }
