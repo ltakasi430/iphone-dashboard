@@ -102,6 +102,9 @@
   /* wallpaper 全面背景 (アプリが Drive / 端末内フォルダから配信する画像。無い環境では出ない) */
   #bg { position:fixed; inset:0; z-index:0; overflow:hidden; }
   #bg img { width:100%; height:100%; object-fit:cover; display:block; opacity:0; transition:opacity .8s; filter:brightness(.48); }
+  /* 次の壁紙へ (文字なし・右下の装飾ダイヤに偽装したボタン) */
+  #wp-next { position:fixed; right:1vw; bottom:1vh; z-index:5; width:4vh; height:4vh; padding:0; background:transparent; border:none; cursor:pointer; display:none; -webkit-tap-highlight-color:transparent; }
+  #wp-next::before { content:""; display:block; width:1.5vh; height:1.5vh; margin:auto; border:1px solid rgba(65,217,238,.45); background:rgba(65,217,238,.10); transform:rotate(45deg); box-shadow:0 0 6px rgba(65,217,238,.25); }
 
   #footer {
     margin-top:auto; display:flex; justify-content:space-between; align-items:baseline;
@@ -172,6 +175,7 @@
     </div>
   </div>
 </div>
+<button id="wp-next" aria-label="次の壁紙"></button>
 
 <script>
 (function(){
@@ -360,6 +364,7 @@
       if (!list || !list.length){ wpList = []; return; }
       var first = !wpList.length;
       wpList = list;
+      $("wp-next").style.display = wpList.length > 1 ? "block" : "none";
       if (first) wpShow(0);
     }).catch(function(){});
   }
@@ -373,7 +378,18 @@
 
   /* ---------- start ---------- */ function isNewerUpdatedAt(v, before) { if(!v) return false; if(!before) return true; var a = Date.parse(v), b = Date.parse(before); if(!isNaN(a) && !isNaN(b)) return a > b; return v > before; } function requestRefresh() { if(refreshing) return; var btn = $("refresh-btn"), status = $("refresh-status"); if(!btn) return; refreshing = true; btn.disabled = true; btn.textContent = "更新中…"; if(status) status.textContent = ""; var before = lastUpdatedAt, startedAt = Date.now(); function finish(ok) { if(!ok && status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; } function poll() { fetchMonitor(); setTimeout(function() { if(isNewerUpdatedAt(lastUpdatedAt, before)) { finish(true); return; } if(Date.now() - startedAt >= REFRESH_TIMEOUT_MS) { finish(false); return; } poll(); }, REFRESH_POLL_MS); } fetch(REFRESH_URL, {method: "POST"}).then(function(r) { if(!r.ok) throw new Error("refresh failed"); poll(); }).catch(function() { if(status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; }); } $("refresh-btn").addEventListener("click", requestRefresh);
   tickClock(); updateAnalog(); buildCal(); fetchHolidays(); fetchWeather(); fetchMonitor(); initWallpaper();
-  setInterval(function(){ if (wpList.length > 1) wpShow(wpIdx + 1); }, 5 * 60 * 1000);
+  var wpTimer = null;
+  function wpRestartTimer(){
+    if (wpTimer) clearInterval(wpTimer);
+    wpTimer = setInterval(function(){ if (wpList.length > 1) wpShow(wpIdx + 1); }, 5 * 60 * 1000);
+  }
+  wpRestartTimer();
+  $("wp-next").addEventListener("click", function(){
+    if (wpList.length < 2) return;
+    wpOff = false;
+    wpShow(wpIdx + 1);
+    wpRestartTimer();
+  });
   setInterval(initWallpaper, 60 * 60 * 1000);
   scheduleClock();
   setInterval(updateAnalog, 100);
