@@ -25,12 +25,17 @@
     display:flex; gap:1.6vw; height:100%;
     padding:2.2vh 2.2vw;
   }
-  #left { flex:0 0 55%; display:flex; flex-direction:column; gap:1.5vh; min-width:0; }
+  #left { flex:0 0 50%; display:flex; flex-direction:column; gap:1.5vh; min-width:0; }
   #right { flex:1; display:flex; flex-direction:column; gap:1.5vh; min-width:0; }
 
   /* clock */
   #clockbox { padding:0.4vh 0.4vw; display:flex; align-items:flex-start; gap:1.6vw; }
-  #clockmain { flex:1; min-width:0; }
+  #clockmain { flex:0 1 auto; min-width:0; }
+  #battery { margin-top:0.5vh; font-size:3.1vh; color:#c4ecf7; display:none; align-items:center; gap:.55em; }
+  #battery .bbar { display:inline-block; width:9vh; height:1.7vh; border:1px solid rgba(94,231,250,.55); border-radius:.45vh; overflow:hidden; }
+  #battery .bbar i { display:block; height:100%; background:#41d9ee; }
+  #battery #bpct { color:#fff; font-variant-numeric:tabular-nums; }
+  #battery #bstate { font-size:2.5vh; color:#8fd8e8; }
   #analog { width:23.5vh; height:23.5vh; flex:none; margin-top:.6vh; }
   #analog .aface { fill:rgba(10,24,38,.7); stroke:rgba(65,217,238,.55); stroke-width:1.6; }
   #analog .ahand { stroke-linecap:round; }
@@ -134,6 +139,7 @@
           <div id="clock">--<span class="colon" id="colon">:</span>--</div>
           <div id="dateline"><span id="date">----/--/--</span><span class="dow" id="dow"></span></div>
           <div id="weather">京都 <span class="temp" id="wtemp">--°</span> <span id="wdesc">取得中…</span></div>
+          <div id="battery">バッテリー <span class="bbar"><i id="bfill" style="width:0%"></i></span> <span id="bpct">--%</span> <span id="bstate"></span></div>
         </div>
         <svg id="analog" viewBox="0 0 100 100" aria-hidden="true">
           <circle class="aface" cx="50" cy="50" r="47"></circle>
@@ -273,6 +279,25 @@
     }).catch(function(){ /* keep last values */ });
   }
 
+  /* ---------- battery (表示している端末自身の残量) ---------- */
+  function initBattery(){
+    if (!navigator.getBattery) return;
+    navigator.getBattery().then(function(b){
+      function upd(){
+        var pct = Math.round(b.level * 100);
+        $("battery").style.display = "flex";
+        $("bpct").textContent = pct + "%";
+        var f = $("bfill");
+        f.style.width = pct + "%";
+        f.style.background = pct <= 20 ? "#ee4141" : (pct <= 40 ? "#eeb041" : "#41d9ee");
+        $("bstate").textContent = b.charging ? "充電中" : "";
+      }
+      b.addEventListener("levelchange", upd);
+      b.addEventListener("chargingchange", upd);
+      upd();
+    }).catch(function(){});
+  }
+
   /* ---------- monitor.json ---------- */
   function fmtDateTime(iso){
     if (!iso) return "—";
@@ -402,7 +427,7 @@
   });
 
   /* ---------- start ---------- */ function isNewerUpdatedAt(v, before) { if(!v) return false; if(!before) return true; var a = Date.parse(v), b = Date.parse(before); if(!isNaN(a) && !isNaN(b)) return a > b; return v > before; } function requestRefresh() { if(refreshing) return; var btn = $("refresh-btn"), status = $("refresh-status"); if(!btn) return; refreshing = true; btn.disabled = true; btn.textContent = "更新中…"; if(status) status.textContent = ""; var before = lastUpdatedAt, startedAt = Date.now(); function finish(ok) { if(!ok && status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; } function poll() { fetchMonitor(); setTimeout(function() { if(isNewerUpdatedAt(lastUpdatedAt, before)) { finish(true); return; } if(Date.now() - startedAt >= REFRESH_TIMEOUT_MS) { finish(false); return; } poll(); }, REFRESH_POLL_MS); } fetch(REFRESH_URL, {method: "POST"}).then(function(r) { if(!r.ok) throw new Error("refresh failed"); poll(); }).catch(function() { if(status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; }); } $("refresh-btn").addEventListener("click", requestRefresh);
-  tickClock(); updateAnalog(); buildCal(); fetchHolidays(); fetchWeather(); fetchMonitor(); initWallpaper();
+  tickClock(); updateAnalog(); buildCal(); fetchHolidays(); fetchWeather(); fetchMonitor(); initWallpaper(); initBattery();
   var wpTimer = null;
   function wpRestartTimer(){
     if (wpTimer) clearInterval(wpTimer);
