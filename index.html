@@ -23,10 +23,10 @@
   #shift { position:relative; z-index:2; height:100%; transition:transform 1.2s ease; }
   #layout {
     display:flex; gap:1.6vw; height:100%;
-    padding:2.2vh 2.2vw;
+    padding:1.9vh 2.2vw;
   }
   #left { flex:0 0 37.5%; display:flex; flex-direction:column; gap:1.5vh; min-width:0; }
-  #right { flex:1; display:flex; flex-direction:column; gap:1.5vh; min-width:0; }
+  #right { flex:1; display:flex; flex-direction:column; gap:1.15vh; min-width:0; }
 
   /* clock */
   #clockbox { padding:0.4vh 0.4vw; display:flex; align-items:flex-start; gap:1.6vw; }
@@ -90,17 +90,23 @@
   .dot.ok { background:#39e08c; box-shadow:0 0 8px rgba(57,224,140,.8); }
   .dot.warn { background:#eeb041; box-shadow:0 0 8px rgba(238,176,65,.8); }
   .dot.error { background:#ee4141; box-shadow:0 0 8px rgba(238,65,65,.8); }
-  #dev-panel { padding:1.1vh 1.2vw; }
-  #devlines { font-size:2.32vh; line-height:1.42; color:#f0fbff; }
+  #dev-panel { padding:.9vh 1.2vw; }
+  #devlines { font-size:2.28vh; line-height:1.34; color:#f0fbff; }
+  #vm-panel { padding:1vh 1.2vw; }
+  #vm-panel h2 { margin-bottom:.6vh; }
+  #vm-grid { display:flex; gap:1.6vw; }
+  #vm-left { flex:1.15; min-width:0; }
+  #vm-right { flex:1; min-width:0; }
+  #vm-panel .kv { font-size:2.3vh; }
   #devlines div { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   #devdetail { font-size:2.25vh; color:#c4ecf7; margin-bottom:.5vh; }
 
   /* calendar */
   #cal { flex:0 0 auto; }
-  #cal table { width:100%; border-collapse:collapse; font-size:3.3vh; text-align:center; }
-  #cal th { color:#5ee7fa; font-weight:600; padding:.9vh 0; }
-  #cal td { color:#e6f8ff; padding:1.05vh 0; font-variant-numeric:tabular-nums; vertical-align:top; }
-  #cal .dnum { display:inline-flex; align-items:center; justify-content:center; min-width:5.6vh; height:5.6vh; border-radius:50%; }
+  #cal table { width:100%; border-collapse:collapse; font-size:3.1vh; text-align:center; }
+  #cal th { color:#5ee7fa; font-weight:600; padding:.65vh 0; }
+  #cal td { color:#e6f8ff; padding:.72vh 0; font-variant-numeric:tabular-nums; vertical-align:top; }
+  #cal .dnum { display:inline-flex; align-items:center; justify-content:center; min-width:5vh; height:5vh; border-radius:50%; }
   #cal td.today .dnum { background:rgba(65,217,238,.34); color:#fff; font-weight:700; }
   #cal td.dim { color:#55707b; }
   #cal td.sun { color:#ffb3b3; } #cal td.sat { color:#b3d4f0; }
@@ -185,10 +191,16 @@
 
       <div class="panel" id="vm-panel">
         <h2>VM <span class="dot" id="vm-dot"></span><span class="sub" id="vm-label"></span></h2>
-        <div class="bar" id="vm-bar"><i style="width:0%"></i></div>
-        <div class="kv"><span>メモリ使用率</span><b id="vm-mem">—</b></div>
-        <div class="kv"><span>負荷 (1分 / 5分)</span><b id="vm-load">—</b></div>
-        <div class="kv"><span>メモリ使用トップ</span><b id="vm-top">—</b></div>
+        <div id="vm-grid">
+          <div id="vm-left">
+            <div class="bar" id="vm-bar"><i style="width:0%"></i></div>
+            <div class="kv"><span>メモリ使用率</span><b id="vm-mem">—</b></div>
+          </div>
+          <div id="vm-right">
+            <div class="kv"><span>負荷 (1分/5分)</span><b id="vm-load">—</b></div>
+            <div class="kv"><span>メモリ使用トップ</span><b id="vm-top">—</b></div>
+          </div>
+        </div>
       </div>
 
       <div id="footer">
