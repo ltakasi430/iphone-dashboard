@@ -25,7 +25,7 @@
     display:flex; gap:1.6vw; height:100%;
     padding:2.2vh 2.2vw;
   }
-  #left { flex:0 0 50%; display:flex; flex-direction:column; gap:1.5vh; min-width:0; }
+  #left { flex:0 0 37.5%; display:flex; flex-direction:column; gap:1.5vh; min-width:0; }
   #right { flex:1; display:flex; flex-direction:column; gap:1.5vh; min-width:0; }
 
   /* clock */
@@ -36,7 +36,7 @@
   #battery .bbar i { display:block; height:100%; background:#41d9ee; }
   #battery #bpct { color:#fff; font-variant-numeric:tabular-nums; }
   #battery #bstate { font-size:2.5vh; color:#8fd8e8; }
-  #analog { width:23.5vh; height:23.5vh; flex:none; margin-top:.6vh; }
+  #analog { width:21.5vh; height:21.5vh; flex:none; margin-top:.6vh; }
   #analog .aface { fill:rgba(10,24,38,.7); stroke:rgba(65,217,238,.55); stroke-width:1.6; }
   #analog .ahand { stroke-linecap:round; }
   #analog .hh { stroke:#eefaff; stroke-width:4.4; }
@@ -44,7 +44,7 @@
   #analog .sh { stroke:#22d3ee; stroke-width:1.6; }
   #analog .acenter { fill:#22d3ee; }
   #clock {
-    font-size:18vh; line-height:1; font-weight:200; letter-spacing:.01em;
+    font-size:17vh; line-height:1; font-weight:200; letter-spacing:.01em;
     color:#ffffff; text-shadow:0 2px 18px rgba(0,229,255,.25);
     font-variant-numeric:tabular-nums; white-space:nowrap;
   }
@@ -54,6 +54,7 @@
   #dateline .dow { color:#41d9ee; margin-left:.5em; }
   #weather { margin-top:0.4vh; font-size:3.1vh; color:#c4ecf7; }
   #weather .temp { color:#fff; font-size:3.7vh; }
+  #weather #whilo { font-size:2.5vh; color:#8fb8c4; margin-left:.6em; }
 
   /* panels */
   .panel {
@@ -138,7 +139,7 @@
         <div id="clockmain">
           <div id="clock">--<span class="colon" id="colon">:</span>--</div>
           <div id="dateline"><span id="date">----/--/--</span><span class="dow" id="dow"></span></div>
-          <div id="weather">京都 <span class="temp" id="wtemp">--°</span> <span id="wdesc">取得中…</span></div>
+          <div id="weather">京都 <span class="temp" id="wtemp">--°</span> <span id="wdesc">取得中…</span><span id="whilo"></span></div>
           <div id="battery">バッテリー <span class="bbar"><i id="bfill" style="width:0%"></i></span> <span id="bpct">--%</span> <span id="bstate"></span></div>
         </div>
         <svg id="analog" viewBox="0 0 100 100" aria-hidden="true">
@@ -164,7 +165,7 @@
         <div class="bar" id="go-bar"><i style="width:0%"></i></div>
         <div class="kv"><span>リセット</span><span><b id="go-reset">—</b><span class="pace" id="go-pace"></span></span></div>
         <div class="kv"><span>月間の使用率</span><span><b id="go-monthly">—</b><span class="pace" id="go-monthly-reset"></span></span></div>
-        <div class="kv"><span>直近の使用率</span><b id="go-rolling">—</b></div>
+        <div class="kv"><span>直近の使用率</span><span><b id="go-rolling">—</b><span class="pace" id="go-rolling-reset"></span></span></div>
       </div>
     </div>
 
@@ -180,6 +181,14 @@
         <div id="devlines"></div>
         <button id="refresh-btn" type="button">最新に更新</button>
         <div id="refresh-status" role="status" aria-live="polite"></div>
+      </div>
+
+      <div class="panel" id="vm-panel">
+        <h2>VM <span class="dot" id="vm-dot"></span><span class="sub" id="vm-label"></span></h2>
+        <div class="bar" id="vm-bar"><i style="width:0%"></i></div>
+        <div class="kv"><span>メモリ使用率</span><b id="vm-mem">—</b></div>
+        <div class="kv"><span>負荷 (1分 / 5分)</span><b id="vm-load">—</b></div>
+        <div class="kv"><span>メモリ使用トップ</span><b id="vm-top">—</b></div>
       </div>
 
       <div id="footer">
@@ -270,11 +279,14 @@
   /* ---------- weather (Kyoto, Open-Meteo) ---------- */
   var WDESC = {0:"快晴",1:"晴れ",2:"一部曇り",3:"曇り",45:"霧",48:"霧",51:"小雨",53:"小雨",55:"小雨",61:"雨",63:"雨",65:"大雨",71:"雪",73:"雪",75:"大雪",80:"にわか雨",81:"にわか雨",82:"激しいにわか雨",95:"雷雨"};
   function fetchWeather(){
-    var url = "https://api.open-meteo.com/v1/forecast?latitude=35.0116&longitude=135.7681&current=temperature_2m,weather_code&timezone=Asia%2FTokyo";
+    var url = "https://api.open-meteo.com/v1/forecast?latitude=35.0116&longitude=135.7681&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&forecast_days=1&timezone=Asia%2FTokyo";
     fetch(url).then(function(r){ return r.json(); }).then(function(j){
       if (j && j.current){
         $("wtemp").textContent = Math.round(j.current.temperature_2m) + "°";
         $("wdesc").textContent = WDESC[j.current.weather_code] || "";
+      }
+      if (j && j.daily && j.daily.temperature_2m_max && j.daily.temperature_2m_max.length){
+        $("whilo").textContent = "最高" + Math.round(j.daily.temperature_2m_max[0]) + "° / 最低" + Math.round(j.daily.temperature_2m_min[0]) + "°";
       }
     }).catch(function(){ /* keep last values */ });
   }
@@ -353,6 +365,22 @@
     $("go-monthly").textContent = (go.monthly_used_pct !== null && go.monthly_used_pct !== undefined) ? go.monthly_used_pct + "%" : "—";
     $("go-monthly-reset").textContent = go.monthly_resets_at ? "リセット " + fmtDateTime(go.monthly_resets_at) : "";
     $("go-rolling").textContent = (go.rolling_used_pct !== null && go.rolling_used_pct !== undefined) ? go.rolling_used_pct + "%" : "—";
+    $("go-rolling-reset").textContent = go.rolling_resets_at ? "リセット " + fmtDateTime(go.rolling_resets_at) : "";
+
+    var vm = j.vm || {};
+    var vdot = $("vm-dot");
+    if (vdot) vdot.className = "dot" + (vm.level === "ok" ? " ok" : ((vm.level === "warn" || vm.level === "high") ? " warn" : (vm.level === "critical" ? " error" : "")));
+    if (vm.level_label) $("vm-label").textContent = vm.level_label;
+    if (vm.mem_used_pct !== null && vm.mem_used_pct !== undefined){
+      var vb = $("vm-bar");
+      vb.className = vm.mem_used_pct >= 90 ? "bar bad" : (vm.mem_used_pct >= 80 ? "bar warn" : "bar");
+      vb.firstChild.style.width = vm.mem_used_pct + "%";
+      $("vm-mem").textContent = vm.mem_used_pct + "%（空き " + (vm.mem_available_mb >= 1024 ? (vm.mem_available_mb / 1024).toFixed(1) + "GB" : vm.mem_available_mb + "MB") + "）";
+    }
+    if (vm.load1 !== null && vm.load1 !== undefined) $("vm-load").textContent = Number(vm.load1).toFixed(2) + " / " + Number(vm.load5).toFixed(2);
+    if (vm.top_processes && vm.top_processes.length){
+      $("vm-top").textContent = vm.top_processes.slice(0, 2).map(function(p){ return p.name + " " + Math.round(p.rss_mb) + "MB"; }).join(" ・ ");
+    }
 
     var svc = (j.services || {}).coneco || {};
     var ddot = $("dev-dot");
