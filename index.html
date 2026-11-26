@@ -163,7 +163,7 @@
         <div class="bigpct"><span class="num" id="go-pct">--%</span><span class="lbl">週間プールの残り</span></div>
         <div class="bar" id="go-bar"><i style="width:0%"></i></div>
         <div class="kv"><span>リセット</span><span><b id="go-reset">—</b><span class="pace" id="go-pace"></span></span></div>
-        <div class="kv"><span>月間の使用率</span><b id="go-monthly">—</b></div>
+        <div class="kv"><span>月間の使用率</span><span><b id="go-monthly">—</b><span class="pace" id="go-monthly-reset"></span></span></div>
         <div class="kv"><span>直近の使用率</span><b id="go-rolling">—</b></div>
       </div>
     </div>
@@ -351,6 +351,7 @@
     $("go-pace").textContent = (go.weekly_used_pct !== null && go.weekly_used_pct !== undefined)
       ? paceText(100 - go.weekly_used_pct, go.weekly_resets_at) : "";
     $("go-monthly").textContent = (go.monthly_used_pct !== null && go.monthly_used_pct !== undefined) ? go.monthly_used_pct + "%" : "—";
+    $("go-monthly-reset").textContent = go.monthly_resets_at ? "リセット " + fmtDateTime(go.monthly_resets_at) : "";
     $("go-rolling").textContent = (go.rolling_used_pct !== null && go.rolling_used_pct !== undefined) ? go.rolling_used_pct + "%" : "—";
 
     var svc = (j.services || {}).coneco || {};
