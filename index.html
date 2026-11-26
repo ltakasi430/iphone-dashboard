@@ -121,6 +121,10 @@
   #footer a { color:#9dc3d1; text-decoration:none; }
   #footer span { white-space:nowrap; }
 
+  @media (max-width:700px) {
+    #clock { font-size:15vh; }
+    #analog { width:16.5vh; height:16.5vh; transform:none; }
+  }
   @media (orientation: portrait) {
     #layout { flex-direction:column; overflow-y:auto; }
     #left, #right { flex:none; }
