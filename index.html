@@ -92,12 +92,6 @@
   .dot.error { background:#ee4141; box-shadow:0 0 8px rgba(238,65,65,.8); }
   #dev-panel { padding:.9vh 1.2vw; }
   #devlines { font-size:2.28vh; line-height:1.34; color:#f0fbff; }
-  #vm-panel { padding:1vh 1.2vw; }
-  #vm-panel h2 { margin-bottom:.6vh; }
-  #vm-grid { display:flex; gap:1.6vw; }
-  #vm-left { flex:1.15; min-width:0; }
-  #vm-right { flex:1; min-width:0; }
-  #vm-panel .kv { font-size:2.3vh; }
   #devlines div { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   #devdetail { font-size:2.25vh; color:#c4ecf7; margin-bottom:.5vh; }
 
@@ -107,7 +101,7 @@
   #cal th { color:#5ee7fa; font-weight:600; padding:.65vh 0; }
   #cal td { color:#e6f8ff; padding:.72vh 0; font-variant-numeric:tabular-nums; vertical-align:top; }
   #cal .dnum { display:inline-flex; align-items:center; justify-content:center; min-width:5vh; height:5vh; border-radius:50%; }
-  #cal td.today .dnum { background:rgba(65,217,238,.34); color:#fff; font-weight:700; }
+  #cal td.today .dnum { background:rgba(65,217,238,.52); color:#fff; font-weight:700; box-shadow:0 0 12px rgba(65,217,238,.5), inset 0 0 0 1.5px rgba(160,240,255,.75); }
   #cal td.dim { color:#55707b; }
   #cal td.sun { color:#ffb3b3; } #cal td.sat { color:#b3d4f0; }
   #cal td.hol .dnum { color:#ff8f9e; }
@@ -187,20 +181,6 @@
         <div id="devlines"></div>
         <button id="refresh-btn" type="button">最新に更新</button>
         <div id="refresh-status" role="status" aria-live="polite"></div>
-      </div>
-
-      <div class="panel" id="vm-panel">
-        <h2>VM <span class="dot" id="vm-dot"></span><span class="sub" id="vm-label"></span></h2>
-        <div id="vm-grid">
-          <div id="vm-left">
-            <div class="bar" id="vm-bar"><i style="width:0%"></i></div>
-            <div class="kv"><span>メモリ使用率</span><b id="vm-mem">—</b></div>
-          </div>
-          <div id="vm-right">
-            <div class="kv"><span>負荷 (1分/5分)</span><b id="vm-load">—</b></div>
-            <div class="kv"><span>メモリ使用トップ</span><b id="vm-top">—</b></div>
-          </div>
-        </div>
       </div>
 
       <div id="footer">
@@ -379,20 +359,7 @@
     $("go-rolling").textContent = (go.rolling_used_pct !== null && go.rolling_used_pct !== undefined) ? go.rolling_used_pct + "%" : "—";
     $("go-rolling-reset").textContent = go.rolling_resets_at ? "リセット " + fmtDateTime(go.rolling_resets_at) : "";
 
-    var vm = j.vm || {};
-    var vdot = $("vm-dot");
-    if (vdot) vdot.className = "dot" + (vm.level === "ok" ? " ok" : ((vm.level === "warn" || vm.level === "high") ? " warn" : (vm.level === "critical" ? " error" : "")));
-    if (vm.level_label) $("vm-label").textContent = vm.level_label;
-    if (vm.mem_used_pct !== null && vm.mem_used_pct !== undefined){
-      var vb = $("vm-bar");
-      vb.className = vm.mem_used_pct >= 90 ? "bar bad" : (vm.mem_used_pct >= 80 ? "bar warn" : "bar");
-      vb.firstChild.style.width = vm.mem_used_pct + "%";
-      $("vm-mem").textContent = vm.mem_used_pct + "%（空き " + (vm.mem_available_mb >= 1024 ? (vm.mem_available_mb / 1024).toFixed(1) + "GB" : vm.mem_available_mb + "MB") + "）";
-    }
-    if (vm.load1 !== null && vm.load1 !== undefined) $("vm-load").textContent = Number(vm.load1).toFixed(2) + " / " + Number(vm.load5).toFixed(2);
-    if (vm.top_processes && vm.top_processes.length){
-      $("vm-top").textContent = vm.top_processes.slice(0, 2).map(function(p){ return p.name + " " + Math.round(p.rss_mb) + "MB"; }).join(" ・ ");
-    }
+
 
     var svc = (j.services || {}).coneco || {};
     var ddot = $("dev-dot");
