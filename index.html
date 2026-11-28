@@ -570,9 +570,11 @@
   /* 表示エフェクトのON/OFF (Neon案の実験項目)。既定は全ON、設定は端末に保存。
      画面を長押しすると設定シートが開く */
   var FXKEYS = ["fx-glass", "fx-vignette", "fx-colon", "fx-merge"];
+  /* 既定: すりガラスだけOFF (壁紙を曇らせないため本人が選択)。他はON */
+  var FXDEFAULT = { "fx-glass": false, "fx-vignette": true, "fx-colon": true, "fx-merge": true };
   var fxState = {};
   try { fxState = JSON.parse(localStorage.getItem("fxState") || "{}") || {}; } catch (e) { fxState = {}; }
-  function fxOn(k){ return fxState[k] !== false; }
+  function fxOn(k){ return fxState[k] !== undefined ? !!fxState[k] : FXDEFAULT[k]; }
   function applyFx(){
     FXKEYS.forEach(function(k){ document.body.classList.toggle(k, fxOn(k)); });
     var rows = document.querySelectorAll(".fx-row");
