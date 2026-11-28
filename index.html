@@ -78,13 +78,17 @@
   .panel h2 .sub { margin-left:auto; font-size:2.15vh; color:#a9cfdb; letter-spacing:0; font-weight:400; }
 
   .bigpct { display:flex; align-items:baseline; gap:1vw; }
-  .bigpct .num { font-size:7.2vh; font-weight:200; color:#fff; line-height:1; }
-  .bigpct .lbl { font-size:2.6vh; color:#d8f6ff; }
-  .bar { height:1.2vh; border-radius:.6vh; background:rgba(255,255,255,.16); margin:1vh 0 .6vh; overflow:hidden; }
-  .bar > i { display:block; height:100%; background:linear-gradient(90deg,#1899b2,#41d9ee); border-radius:.6vh; }
+  .bigpct .num { font-size:7.2vh; font-weight:200; color:#fff; line-height:1; font-variant-numeric:tabular-nums; }
+  .bigpct .num .unit { font-size:.6em; margin-left:.06em; }
+  .bigpct .lbl { font-size:2.6vh; color:#d8f6ff; opacity:.82; }
+  .bar { height:1.2vh; border-radius:.6vh; background:rgba(255,255,255,.16); margin:1vh 0 .6vh; overflow:hidden; color:#41d9ee; }
+  .bar > i { display:block; height:100%; background:linear-gradient(90deg,#1899b2,#41d9ee); border-radius:.6vh; box-shadow:0 0 1.4vh currentColor; }
+  .bar.warn { color:#eeb041; }
   .bar.warn > i { background:linear-gradient(90deg,#b26a18,#eeb041); }
+  .bar.bad { color:#ee4141; }
   .bar.bad > i { background:linear-gradient(90deg,#b21818,#ee4141); }
   .kv { display:flex; justify-content:space-between; font-size:2.45vh; color:#e2f7ff; padding:.35vh 0; }
+  .kv > span:first-child { opacity:.62; letter-spacing:.05em; }
   .kv b { color:#fff; font-weight:600; font-variant-numeric:tabular-nums; }
   .kv .pace { color:#a9cfdb; font-size:2.1vh; margin-left:.7em; }
   .na { color:#93aeba; }
@@ -96,8 +100,10 @@
 
   .dot { display:inline-block; width:1.5vh; height:1.5vh; border-radius:50%; background:#5a6d75; vertical-align:middle; }
   .dot.ok { background:#39e08c; box-shadow:0 0 8px rgba(57,224,140,.8); }
-  .dot.warn { background:#eeb041; box-shadow:0 0 8px rgba(238,176,65,.8); }
-  .dot.error { background:#ee4141; box-shadow:0 0 8px rgba(238,65,65,.8); }
+  .dot.warn { background:#eeb041; box-shadow:0 0 8px rgba(238,176,65,.8); animation:dotpulse-a 1.6s ease-out infinite; }
+  .dot.error { background:#ee4141; box-shadow:0 0 8px rgba(238,65,65,.8); animation:dotpulse-r 1.6s ease-out infinite; }
+  @keyframes dotpulse-a { 0% { box-shadow:0 0 0 0 rgba(238,176,65,.5); } 100% { box-shadow:0 0 0 1.7vh rgba(238,176,65,0); } }
+  @keyframes dotpulse-r { 0% { box-shadow:0 0 0 0 rgba(238,65,65,.5); } 100% { box-shadow:0 0 0 1.7vh rgba(238,65,65,0); } }
   #dev-panel { padding:1.2vh 1.2vw; flex:1; display:flex; flex-direction:column; }
   #dev-panel h2 { font-size:3.9vh; }
   #dev-panel h2 .sub { font-size:2.7vh; }
@@ -115,6 +121,7 @@
   #cal .dnum { display:inline-flex; align-items:center; justify-content:center; min-width:5vh; height:5vh; border-radius:50%; }
   #cal td.today .dnum { background:rgba(65,217,238,.52); color:#fff; font-weight:700; box-shadow:0 0 12px rgba(65,217,238,.5), inset 0 0 0 1.5px rgba(160,240,255,.75); }
   #cal td.dim { color:#55707b; }
+  #cal td.past { opacity:.38; }
   #cal td.sun { color:#ffb3b3; } #cal td.sat { color:#b3d4f0; }
   #cal td.hol .dnum { color:#ff8f9e; }
 
@@ -131,6 +138,60 @@
   }
   #footer a { color:#9dc3d1; text-decoration:none; }
   #footer span { white-space:nowrap; }
+
+  /* ---- Neon案エフェクト (長押しの設定シートで個別にON/OFF、既定は全ON) ---- */
+  /* 周辺減光ビネット: 中央の壁紙は鮮やかに、縁は暗く */
+  #vignette {
+    position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0; transition:opacity .6s;
+    background:
+      radial-gradient(ellipse at center, rgba(0,0,0,0) 44%, rgba(0,0,0,.44) 100%),
+      linear-gradient(180deg, rgba(0,0,0,.30), rgba(0,0,0,0) 24%, rgba(0,0,0,0) 78%, rgba(0,0,0,.34));
+  }
+  body.fx-vignette #vignette { opacity:1; }
+  body.fx-vignette #bg img { filter:brightness(.62); }
+  body.fx-vignette #clockbox { text-shadow:0 2px 12px rgba(0,0,0,.85), 0 0 26px rgba(0,0,0,.45); }
+  body.fx-vignette #clock { text-shadow:0 2px 14px rgba(0,0,0,.82); }
+  /* すりガラス */
+  body.fx-glass .panel, body.fx-glass.fx-merge #aiwrap {
+    backdrop-filter:blur(9px) saturate(1.25);
+    -webkit-backdrop-filter:blur(9px) saturate(1.25);
+    border-color:rgba(100,220,255,.16);
+    border-top-color:rgba(255,255,255,.22);
+  }
+  /* コロンをふわっと */
+  body.fx-colon #clock .colon { transition:opacity .45s ease; }
+  body.fx-colon #clock .colon.off { opacity:.3; }
+  /* AIパネルを1枚に統合 */
+  #aiwrap { display:flex; flex-direction:column; gap:1.5vh; }
+  body.fx-merge #aiwrap {
+    background:rgba(10,24,38,var(--panel-alpha));
+    border:1px solid rgba(65,217,238,.5); border-radius:1.4vh; padding:1.4vh 1.2vw; gap:0;
+  }
+  body.fx-merge #aiwrap .panel { background:transparent; border:none; border-radius:0; padding:0; backdrop-filter:none; -webkit-backdrop-filter:none; }
+  body.fx-merge #quota-panel { border-top:1px solid rgba(100,220,255,.15); margin-top:1.3vh; padding-top:1.3vh !important; }
+  /* 設定シート (長押しで開く) */
+  #fx-sheet {
+    position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:60;
+    width:56vw; max-width:640px; background:rgba(8,20,32,.94);
+    border:1px solid rgba(94,231,250,.45); border-radius:1.6vh; padding:2.2vh 2vw;
+    display:none;
+  }
+  #fx-sheet.open { display:block; }
+  #fx-sheet .fx-title { font-size:2.9vh; color:#5ee7fa; letter-spacing:.14em; margin-bottom:1.4vh; }
+  #fx-sheet .fx-row {
+    display:flex; justify-content:space-between; align-items:center; width:100%;
+    background:none; border:none; border-top:1px solid rgba(94,231,250,.18);
+    color:#eafcff; font-size:2.8vh; padding:1.5vh .4vw; cursor:pointer; text-align:left;
+  }
+  #fx-sheet .fx-pill {
+    font-size:2.3vh; color:#06222b; background:#41d9ee; border-radius:99px;
+    padding:.3vh 1.4vw; letter-spacing:.08em; flex:none;
+  }
+  #fx-sheet .fx-row.off .fx-pill { background:#3d5561; color:#b9d6de; }
+  #fx-sheet .fx-close {
+    display:block; margin:1.6vh auto 0; background:none; border:1px solid rgba(94,231,250,.4);
+    border-radius:99px; color:#8fd8e8; font-size:2.5vh; padding:.8vh 3vw; cursor:pointer; letter-spacing:.2em;
+  }
 
   @media (max-width:700px) {
     #clock { font-size:15vh; }
@@ -150,6 +211,7 @@
 </head>
 <body>
 <div id="bg"><img id="bg-img" alt=""></div>
+<div id="vignette"></div>
 <div id="nightdim"></div>
 <div id="alpha-toast"></div>
 
@@ -173,6 +235,7 @@
         </svg>
       </div>
 
+      <div id="aiwrap">
       <div class="panel" id="claude-panel">
         <h2>Muse <span class="sub" id="claude-plan">Power</span></h2>
         <div class="bigpct"><span class="num" id="claude-pct">--%</span><span class="lbl">週間枠の残り</span></div>
@@ -187,6 +250,7 @@
         <div class="kv"><span>リセット</span><span><b id="go-reset">—</b><span class="pace" id="go-pace"></span></span></div>
         <div class="kv"><span>月間の使用率</span><span><b id="go-monthly">—</b><span class="pace" id="go-monthly-reset"></span></span></div>
         <div class="kv"><span>直近の使用率</span><span><b id="go-rolling">—</b><span class="pace" id="go-rolling-reset"></span></span></div>
+      </div>
       </div>
     </div>
 
@@ -213,6 +277,15 @@
 </div>
 <button id="wp-next" aria-label="次の壁紙"></button>
 
+<div id="fx-sheet" role="dialog" aria-label="表示エフェクト設定">
+  <div class="fx-title">表示エフェクト</div>
+  <button class="fx-row" type="button" data-fx="fx-glass">すりガラス<span class="fx-pill">ON</span></button>
+  <button class="fx-row" type="button" data-fx="fx-vignette">ビネット＋時計の影<span class="fx-pill">ON</span></button>
+  <button class="fx-row" type="button" data-fx="fx-colon">コロンをなめらか<span class="fx-pill">ON</span></button>
+  <button class="fx-row" type="button" data-fx="fx-merge">AIパネルを1枚に統合<span class="fx-pill">ON</span></button>
+  <button class="fx-close" type="button" id="fx-close">閉じる</button>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -229,7 +302,7 @@
     $("colon").className = "colon" + (s % 2 ? " off" : "");
     $("date").textContent = now.getFullYear() + "/" + pad(now.getMonth()+1) + "/" + pad(now.getDate());
     $("dow").textContent = "(" + DOW[now.getDay()] + ")";
-    document.body.className = (h >= 23 || h < 6) ? "night" : "";
+    document.body.classList.toggle("night", h >= 23 || h < 6);
   }
   /* 秒の境界に合わせて更新する (setInterval の累積ズレで点滅が不規則になるのを防ぐ) */
   function scheduleClock(){
@@ -281,6 +354,7 @@
       var hname = HOLIDAYS[y + "-" + pad(mo+1) + "-" + pad(d)] || "";
       var cls = (d===today) ? "today" : (dow===0 ? "sun" : (dow===6 ? "sat" : ""));
       if (hname) cls = (cls ? cls + " " : "") + "hol";
+      if (d < today) cls = (cls ? cls + " " : "") + "past";
       var inner = '<span class="dnum">' + d + "</span>";
       html += '<td class="' + cls + '">' + inner + "</td>"; cell++;
       if (cell % 7 === 0 && d < days) html += "</tr><tr>";
@@ -314,7 +388,7 @@
         $("bpct").textContent = pct + "%";
         var f = $("bfill");
         f.style.width = pct + "%";
-        f.style.background = pct <= 20 ? "#ee4141" : (pct <= 40 ? "#eeb041" : "#41d9ee");
+        f.style.background = pct <= 15 ? "#ee4141" : (pct <= 30 ? "#eeb041" : "#41d9ee");
         $("bstate").textContent = b.charging ? "充電中" : "";
       }
       b.addEventListener("levelchange", upd);
@@ -330,7 +404,7 @@
     if (isNaN(d.getTime())) return "—";
     return (d.getMonth()+1) + "/" + d.getDate() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
   }
-  function barClass(pct){ return pct <= 15 ? "bar bad" : (pct <= 35 ? "bar warn" : "bar"); }
+  function barClass(pct){ return pct <= 15 ? "bar bad" : (pct <= 30 ? "bar warn" : "bar"); }
   function paceText(remainPct, resetIso){
     if (remainPct === null || remainPct === undefined || !resetIso) return "";
     var ms = Date.parse(resetIso) - Date.now();
@@ -356,7 +430,7 @@
 
     var mu = j.muse || {};
     if (mu.weekly_remaining_pct !== null && mu.weekly_remaining_pct !== undefined){
-      $("claude-pct").textContent = mu.weekly_remaining_pct + "%";
+      $("claude-pct").innerHTML = mu.weekly_remaining_pct + '<span class="unit">%</span>';
       var b = $("claude-bar"); b.className = barClass(mu.weekly_remaining_pct);
       b.firstChild.style.width = mu.weekly_remaining_pct + "%";
     } else { $("claude-pct").innerHTML = '<span class="na">未取得</span>'; }
@@ -367,7 +441,7 @@
     var go = j.opencode_go || {};
     if (go.weekly_used_pct !== null && go.weekly_used_pct !== undefined){
       var remain = 100 - go.weekly_used_pct;
-      $("go-pct").textContent = remain + "%";
+      $("go-pct").innerHTML = remain + '<span class="unit">%</span>';
       var gb = $("go-bar"); gb.className = barClass(remain);
       gb.firstChild.style.width = remain + "%";
     } else { $("go-pct").innerHTML = '<span class="na">未取得</span>'; }
@@ -384,9 +458,9 @@
 
     var svc = (j.services || {}).coneco || {};
     var ddot = $("dev-dot");
-    if (ddot) ddot.className = "dot" + (svc.status === "ok" ? " ok" : (svc.status === "warn" ? " warn" : ""));
+    if (ddot) ddot.className = "dot" + (svc.status === "ok" ? " ok" : (svc.status === "warn" ? " warn" : (svc.status === "error" ? " error" : "")));
     var dsub = $("dev-sub");
-    if (dsub) dsub.textContent = svc.status === "ok" ? "稼働中" : (svc.status === "warn" ? "要確認" : "");
+    if (dsub) dsub.textContent = svc.status === "ok" ? "稼働中" : (svc.status === "warn" ? "要確認" : (svc.status === "error" ? "異常" : ""));
     var ddet = $("devdetail");
     if (ddet) ddet.textContent = svc.detail || "未接続";
     var dlines = $("devlines");
@@ -492,6 +566,47 @@
     suppressClick = true;
     setTimeout(function(){ suppressClick = false; }, 350);
   }, {passive:true});
+
+  /* 表示エフェクトのON/OFF (Neon案の実験項目)。既定は全ON、設定は端末に保存。
+     画面を長押しすると設定シートが開く */
+  var FXKEYS = ["fx-glass", "fx-vignette", "fx-colon", "fx-merge"];
+  var fxState = {};
+  try { fxState = JSON.parse(localStorage.getItem("fxState") || "{}") || {}; } catch (e) { fxState = {}; }
+  function fxOn(k){ return fxState[k] !== false; }
+  function applyFx(){
+    FXKEYS.forEach(function(k){ document.body.classList.toggle(k, fxOn(k)); });
+    var rows = document.querySelectorAll(".fx-row");
+    for (var i = 0; i < rows.length; i++){
+      var on = fxOn(rows[i].getAttribute("data-fx"));
+      rows[i].classList.toggle("off", !on);
+      rows[i].querySelector(".fx-pill").textContent = on ? "ON" : "OFF";
+    }
+  }
+  applyFx();
+  var fxRowList = document.querySelectorAll(".fx-row");
+  for (var j = 0; j < fxRowList.length; j++){
+    fxRowList[j].addEventListener("click", function(){
+      var k = this.getAttribute("data-fx");
+      fxState[k] = !fxOn(k);
+      try { localStorage.setItem("fxState", JSON.stringify(fxState)); } catch (e) {}
+      applyFx();
+    });
+  }
+  $("fx-close").addEventListener("click", function(){ $("fx-sheet").classList.remove("open"); });
+  var pressTimer = null;
+  document.addEventListener("touchstart", function(e){
+    if (e.touches.length !== 1) return;
+    if (e.target.closest && e.target.closest("button, a")) return;
+    pressTimer = setTimeout(function(){
+      pressTimer = null;
+      $("fx-sheet").classList.add("open");
+      suppressClick = true;
+      setTimeout(function(){ suppressClick = false; }, 400);
+    }, 620);
+  }, {passive:true});
+  function cancelPress(){ if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }
+  document.addEventListener("touchend", cancelPress);
+  document.addEventListener("touchmove", cancelPress, {passive:true});
 
   /* ---------- start ---------- */ function isNewerUpdatedAt(v, before) { if(!v) return false; if(!before) return true; var a = Date.parse(v), b = Date.parse(before); if(!isNaN(a) && !isNaN(b)) return a > b; return v > before; } function requestRefresh() { if(refreshing) return; var btn = $("refresh-btn"), status = $("refresh-status"); if(!btn) return; refreshing = true; btn.disabled = true; btn.textContent = "更新中…"; if(status) status.textContent = ""; var before = lastUpdatedAt, startedAt = Date.now(); function finish(ok) { if(!ok && status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; } function poll() { fetchMonitor(); setTimeout(function() { if(isNewerUpdatedAt(lastUpdatedAt, before)) { finish(true); return; } if(Date.now() - startedAt >= REFRESH_TIMEOUT_MS) { finish(false); return; } poll(); }, REFRESH_POLL_MS); } fetch(REFRESH_URL, {method: "POST"}).then(function(r) { if(!r.ok) throw new Error("refresh failed"); poll(); }).catch(function() { if(status) status.textContent = "更新できませんでした"; refreshing = false; btn.disabled = false; btn.textContent = "最新に更新"; }); } $("refresh-btn").addEventListener("click", requestRefresh);
   tickClock(); updateAnalog(); buildCal(); fetchHolidays(); fetchWeather(); fetchMonitor(); initWallpaper(); initBattery();
